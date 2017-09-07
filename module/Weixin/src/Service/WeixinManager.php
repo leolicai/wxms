@@ -19,6 +19,24 @@ class WeixinManager extends BaseManager
 {
 
     /**
+     * @param $appid
+     * @return null|object|Weixin
+     */
+    public function getWeixinByAppID($appid)
+    {
+        return $this->getWeixinRepository()->findOneBy(['wxAppID' => $appid]);
+    }
+
+    /**
+     * @param Weixin $weixin
+     */
+    public function saveModifiedWeixin(Weixin $weixin)
+    {
+        $this->getEntityManager()->persist($weixin);
+        $this->getEntityManager()->flush();
+    }
+
+    /**
      * @return WeixinRepository | \Doctrine\ORM\EntityRepository
      */
     private function getWeixinRepository()

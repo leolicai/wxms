@@ -165,6 +165,13 @@ class MenuManager
             array_push($this->sideTreeItems, $item);
         }
 
+        $item = self::CreateMenuItem('Admin\Controller\WeixinController', 'weixin', '微信公众号管理', $url('admin/weixin', ['suffix' => '.html']));
+        $item['dropdown'] = [
+            self::CreateMenuItem('Admin\Controller\WeixinController::indexAction', 'bars', '公众号列表', $url('admin/weixin', ['action' => 'index', 'suffix' => '.html'])),
+            self::CreateMenuItem('Admin\Controller\WeixinController::addAction', 'plus', '添加公众号', $url('admin/weixin', ['action' => 'add', 'suffix' => '.html'])),
+        ];
+        array_push($this->sideTreeItems, $item);
+
     }
 
     /**

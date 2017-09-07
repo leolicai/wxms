@@ -22,6 +22,7 @@ return [
             Controller\DashboardController::class => InvokableFactory::class,
             Controller\ProfileController::class => InvokableFactory::class,
             Controller\AdminerController::class => InvokableFactory::class,
+            Controller\WeixinController::class => InvokableFactory::class,
         ],
     ],
 
@@ -159,6 +160,21 @@ return [
                         ],
                     ],
 
+                    'weixin' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => 'weixin[/:action[/:key]][:suffix]',
+                            'constraints' => [
+                                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                                'key' => '[a-zA-Z0-9_\-]+',
+                                'suffix' => '(/|.html)',
+                            ],
+                            'defaults' => [
+                                'controller' => Controller\WeixinController::class,
+                                'action' => 'index',
+                            ],
+                        ],
+                    ],
                     // TBM
                 ],
             ],

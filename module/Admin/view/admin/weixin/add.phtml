@@ -1,0 +1,113 @@
+<?php
+use Admin\Form\WeixinForm;
+
+$this->adminPageTitleBar('添加公众号');
+$this->adminSideTreeMenu()->setActiveID($data->activeID);
+
+$input = $data->form->get(WeixinForm::FIELD_APPID);
+$input->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => '这里请填写 AppID'
+]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '微信公众号的 AppID 不填写后面没法继续愉快的玩耍了!',
+    \Zend\Validator\Regex::NOT_MATCH => '请填写正确的 AppID, 请注意大小写!',
+    \Weixin\Validator\AppIdUniqueValidator::APPID_EXISTED => '该公众号已经被登记, 不能再被使用.',
+]);
+
+
+$input = $data->form->get(WeixinForm::FIELD_APPSECRET);
+$input->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => '这里请填写 AppSecret'
+]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '微信公众号的 AppSecret 不填写后面没法继续愉快的玩耍了!',
+    \Zend\Validator\Regex::NOT_MATCH => '请填写正确的 AppSecret, 请注意大小写!',
+]);
+
+$data->form->get(WeixinForm::FIELD_SUBMIT)->setAttributes(['class'=>"btn btn-primary"]);
+
+$data->form->prepare();
+
+$alert = '';
+if(!empty($data->error)) {
+    $alert = 'alert("' . $data->error . '");';
+}
+
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+$(function () {
+    $("form").submit(function () {
+        var appid = $("#appid").val();
+        if(appid.length < 3) {
+            $("#appid").focus();
+            setTimeout(function() {
+                $("#submit").attr("disabled", false);  
+            }, 500);
+            return false;
+        }
+        var appsecret = $("#appsecret").val();
+        if(appsecret.length < 3) {
+            $("#appsecret").focus();
+            setTimeout(function() {
+                $("#submit").attr("disabled", false);  
+            }, 500);
+            return false;
+        }
+        if(confirm("请确认您的公众号 AppID 为:\\n" + appid + "\\n接下来系统建和微信平台确认此 ID, 一旦确认 AppID 合法, 您将不能再修改您的 AppID. \\n是否需要继续?")) {
+            alert("接下来将和微信平台进行信息验证, 可能需要一点时间, 请勿离开此页, 我们会通知您验证结果.");
+            return true;
+        } else {
+            $(":submit", this).attr("disabled", false);
+            return false;
+        }
+    });
+    $alert
+});
+JS;
+$this->inlineScript()->captureEnd();
+
+?>
+
+
+<div class="row">
+    <div class="col-lg-6">
+
+        <div class="alert alert-danger">
+            <strong>如果使用本平台, 请勿将 AppSecret 授权给其他平台. 否则全部功能将受影响.</strong>
+        </div>
+
+        <div class="form-group alert alert-warning" role="alert">
+            <strong>请注意:</strong> 提交创建的公众号会与微信平台进行验证. <br>
+            公众号经过验证可用后 <strong>AppID</strong> 将不再被允许修改! <br>
+            验证过程可能需要点时间, 请勿关闭本页. 验证完毕会自动刷新页面.
+        </div>
+
+        <?php echo $this->form()->openTag($data->form); ?>
+
+        <div class="form-group">
+            <?php echo $this->formElement($data->form->get(WeixinForm::FIELD_CSRF)); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($data->form->get(WeixinForm::FIELD_APPID), '微信公众号 AppID'); ?>
+            <?php echo $this->formElement($data->form->get(WeixinForm::FIELD_APPID)); ?>
+            <?php echo $this->formElementErrors($data->form->get(WeixinForm::FIELD_APPID)); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($data->form->get(WeixinForm::FIELD_APPSECRET), '微信公众号 AppSecret'); ?>
+            <?php echo $this->formElement($data->form->get(WeixinForm::FIELD_APPSECRET)); ?>
+            <?php echo $this->formElementErrors($data->form->get(WeixinForm::FIELD_APPSECRET)); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formElement($data->form->get(WeixinForm::FIELD_SUBMIT)); ?>
+        </div>
+
+        <?php echo $this->form()->closeTag(); ?>
+
+    </div>
+</div>

@@ -30,8 +30,7 @@ class Weixin
     /**
      * @var integer
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="SEQUENCE")
-     * @ORM\SequenceGenerator(sequenceName="wx_id", initialValue=9527, allocationSize=1)
+     * @ORM\GeneratedValue
      * @ORM\Column(name="wx_id", type="integer")
      */
     private $wxID;

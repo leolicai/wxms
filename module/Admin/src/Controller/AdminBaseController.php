@@ -13,6 +13,7 @@ namespace Admin\Controller;
 use Admin\Service\AdminerManager;
 use Admin\Service\AuthService;
 use Application\Controller\AppBaseController;
+use Weixin\Service\WeixinManager;
 
 
 /**
@@ -21,6 +22,14 @@ use Application\Controller\AppBaseController;
  */
 class AdminBaseController extends AppBaseController
 {
+
+    /**
+     * @return WeixinManager
+     */
+    protected function appWeixinManager()
+    {
+        return $this->appServiceManager(WeixinManager::class);
+    }
 
     /**
      * @return AdminerManager
