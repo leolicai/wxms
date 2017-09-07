@@ -20,4 +20,5 @@ return [
     'Mail',
     'Application',
     'Admin',
+    'Weixin',
 ];

@@ -22,7 +22,8 @@
             "Form\\": "module/Form/src",
             "Mail\\": "module/Mail/src",
             "Application\\": "module/Application/src/",
-            "Admin\\": "module/Admin/src/"
+            "Admin\\": "module/Admin/src/",
+            "Weixin\\": "module/Weixin/src/"
         }
     }
 }
