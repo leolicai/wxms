@@ -1,0 +1,35 @@
+<?php
+$this->adminPageTitleBar('我的信息');
+
+?>
+
+<div class="row">
+    <div class="col-md-6">
+        <table class="table table-striped table-bordered">
+            <tr>
+                <th width="30%">名称</th>
+                <th>资料</th>
+            </tr>
+            <tr>
+                <td>登入账号(E-mail):</td>
+                <td><?php echo $data->adminer->getAdminEmail(); ?></td>
+            </tr>
+            <tr>
+                <td>我的名字:</td>
+                <td><?php echo $this->escapeHtml($data->adminer->getAdminName()); ?></td>
+            </tr>
+            <tr>
+                <td>账号级别:</td>
+                <td><?php echo $data->adminer->getAdminLevelAsString(); ?></td>
+            </tr>
+            <tr>
+                <td>账号过期时间:</td>
+                <td><?php echo $data->adminer->getAdminExpired()->format('Y-m-d'); ?></td>
+            </tr>
+            <tr>
+                <td>账号创建时间:</td>
+                <td><?php echo $data->adminer->getAdminCreated()->format('Y-m-d'); ?></td>
+            </tr>
+        </table>
+    </div>
+</div>

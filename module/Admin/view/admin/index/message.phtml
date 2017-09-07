@@ -1,0 +1,80 @@
+<?php
+
+
+$this->headTitle('信息提示');
+
+if($data->delay > 0 && (!empty($data->title) && !empty($data->url))) {
+
+    $this->inlineScript()->captureStart();
+    echo <<<JS
+    $(function(){
+        var seconds = parseInt($("#delay_seconds").text());
+        var url = $("#reload_url").attr("href");
+        
+        if(seconds > 0) {
+            var timer = window.setInterval(function(){
+                seconds--;
+                $("#delay_seconds").text("" + seconds);
+                if(seconds < 1) {
+                    window.clearInterval(timer);
+                    window.location.href = url;
+                }
+            }, 1000);
+        }
+    });
+JS;
+    $this->inlineScript()->captureEnd();
+
+}
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+function globalFuncMoveToCentered()
+{
+    var ww = $(window).width();
+    var wh = $(window).height();
+
+    var dw = $("#centered_container").width();
+    var dh = $("#centered_container").height();
+
+    var left = 0;
+    var top  = 0;
+    if(ww > dw) {
+        left = (ww - dw) / 2;
+    }
+    if(wh > dh) {
+        top = ((wh - dh) / 2) * 0.8;
+    }
+
+    $("#centered_container").css({"left": left, "top": top});
+
+}
+
+$(function(){
+    globalFuncMoveToCentered();
+    $(window).resize(function(){
+        globalFuncMoveToCentered();
+    });
+});
+JS;
+$this->inlineScript()->captureEnd();
+
+?>
+
+<div id="centered_container" class="centered">
+    <div class="jumbotron message-container">
+        <h3><?php echo $data->topic; ?></h3>
+        <p><?php echo $data->content; ?></p>
+        <?php if(!empty($data->title) && !empty($data->url)) { ?>
+            <p>
+                <a class="btn btn-primary" id="reload_url" href="<?php echo $data->url; ?>" role="button"><?php echo $data->title; ?></a>
+                <?php if($data->delay > 0) { ?>
+
+                    <small><i class="fa fa-spinner fa-spin fa-fw"></i> <strong id="delay_seconds"><?php echo (int)$data->delay; ?></strong> 秒后页面会自动更新!</small>
+                <?php } ?>
+            </p>
+        <?php } ?>
+    </div>
+</div>
+
+

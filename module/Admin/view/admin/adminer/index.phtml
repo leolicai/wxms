@@ -1,0 +1,121 @@
+<?php
+
+use Admin\Entity\Adminer;
+
+$this->adminPageTitleBar('管理员');
+$this->adminSideTreeMenu()->setActiveID($data->activeID);
+
+?>
+
+<div class="row">
+    <div class="col-lg-12">
+        <p>
+            <a class="btn btn-default" href="<?php echo $this->url('admin/adminer', ['action' => 'add']); ?>">
+                <i class="fa fa-plus fa-fw"></i> 添加成员
+            </a>
+        </p>
+
+        <table class="table table-striped">
+            <tr>
+                <th>No</th>
+                <th>名字</th>
+                <th>登录账号</th>
+                <th>过期时间</th>
+                <th>等级</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+
+            <?php $i = 1;
+            foreach ($data->adminers as $adminer) {
+                if (!$adminer instanceof Adminer) {
+                    continue;
+                } ?>
+
+                <tr>
+                    <td><?php echo $i++; ?></td>
+                    <td><?php echo $adminer->getAdminName(); ?></td>
+                    <td><?php echo $adminer->getAdminEmail(); ?></td>
+                    <td><?php echo $adminer->getAdminExpired()->format('Y-m-d'); ?></td>
+                    <td><?php echo $adminer->getAdminLevelAsString(); ?></td>
+                    <td>
+                        <span class="label label-<?php echo Adminer::ACTIVATED_VALID == $adminer->getAdminActivated() ? 'success' : 'danger'; ?>">
+                            <?php echo $adminer->getAdminActivatedAsString(); ?>
+                        </span>
+                        <?php if (Adminer::LOCKED_VALID == $adminer->getAdminLocked()) { ?>
+                            <span> &nbsp;&nbsp; </span>
+                            <span class="label label-danger">
+                            <?php echo $adminer->getAdminLockedAsString(); ?>
+                        </span>
+                        <?php } ?>
+                    </td>
+                    <td>
+                        <ul class="nav nav-pills actions-list" role="tablist">
+                            <li role="presentation" class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                    操作选项 <span class="caret"></span>
+                                </a>
+                                <?php if (Adminer::DEFAULT_ADMIN != $adminer->getAdminDefault()) { ?>
+                                    <ul class="dropdown-menu" role="menu">
+
+                                        <?php if (Adminer::ACTIVATED_VALID != $adminer->getAdminActivated()) { ?>
+                                            <li>
+                                                <a href="<?php echo $this->url('admin/adminer', ['action' => 'active', 'key' => $adminer->getAdminID()]); ?>">
+                                                    <i class="fa fa-check fa-fw" aria-hidden="true"></i> 激活账户
+                                                </a>
+                                            </li>
+                                            <li class="divider"></li>
+                                        <?php } ?>
+                                        <?php if (Adminer::LOCKED_INVALID == $adminer->getAdminLocked()) { ?>
+                                            <li>
+                                                <a href="<?php echo $this->url('admin/adminer', ['action' => 'lock', 'key' => $adminer->getAdminID()]); ?>">
+                                                    <i class="fa fa-lock fa-fw" aria-hidden="true"></i> 锁定账户
+                                                </a>
+                                            </li>
+                                        <?php } else { ?>
+                                            <li>
+                                                <a href="<?php echo $this->url('admin/adminer', ['action' => 'unlock', 'key' => $adminer->getAdminID()]); ?>">
+                                                    <i class="fa fa-unlock fa-fw" aria-hidden="true"></i> 解除锁定
+                                                </a>
+                                            </li>
+                                        <?php } ?>
+                                        <li class="divider"></li>
+                                        <li>
+                                            <a href="<?php echo $this->url('admin/adminer', ['action' => 'profile', 'key' => $adminer->getAdminID()]); ?>">
+                                                <i class="fa fa-pencil-square-o fa-fw" aria-hidden="true"></i> 修改信息
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="<?php echo $this->url('admin/adminer', ['action' => 'level', 'key' => $adminer->getAdminID()]); ?>">
+                                                <i class="fa fa-level-up fa-fw" aria-hidden="true"></i> 更新等级
+                                            </a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li>
+                                            <a href="<?php echo $this->url('admin/adminer', ['action' => 'password', 'key' => $adminer->getAdminID()]); ?>">
+                                                <i class="fa fa-hashtag fa-fw" aria-hidden="true"></i> 更新密码
+                                            </a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li>
+                                            <a href="<?php echo $this->url('admin/adminer', ['action' => 'expired', 'key' => $adminer->getAdminID()]); ?>">
+                                                <i class="fa fa-calendar-check-o fa-fw" aria-hidden="true"></i> 过期时间
+                                            </a>
+                                        </li>
+
+                                    </ul>
+                                <?php } ?>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+            <?php } ?>
+
+        </table>
+
+    </div>
+</div>
+
+<?php echo $this->pagination()->render(); ?>
+
