@@ -37,6 +37,7 @@ $isDevMode = true;
 $emConfig = Setup::createAnnotationMetadataConfiguration(
     [
         'AdminEntity' => __DIR__ . "/../module/Admin/src/Entity",
+        'WeixinEntity' => __DIR__ . "/../module/Weixin/src/Entity",
     ],
     $isDevMode,
     null,
