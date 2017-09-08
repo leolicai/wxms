@@ -1,0 +1,158 @@
+<?php
+
+use Admin\Form\WeixinClientForm as Form;
+
+if (! $data->weixin instanceof \Weixin\Entity\Weixin) {
+    throw new \Admin\Exception\RuntimeException('Invalid weixin object');
+}
+
+$this->adminPageTitleBar('添加公众号客户端', $data->weixin->getWxName());
+$this->adminSideTreeMenu()->setActiveID($data->activeID);
+
+
+$input = $data->form->get(Form::FIELD_NAME);
+$input->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => '客户端名称'
+]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '请设置好客户端的名称方便您日后管理!',
+    \Zend\Validator\StringLength::TOO_SHORT => '名字太短啦, 这样容易和其他的客户端重名哦.',
+    \Zend\Validator\StringLength::TOO_LONG => '名字太长, 感觉电脑屏幕都不够用了都.',
+]);
+
+
+$input = $data->form->get(Form::FIELD_DOMAIN);
+$input->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => '例如: example.com'
+]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '请输入允许来访的客户端域名, 这样能更好的包含您的数据安全.',
+    '__undefined__' => '请输入有效的客户端域名.',
+]);
+
+$input = $data->form->get(Form::FIELD_IP);
+$input->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => '例如: 114.114.114.114'
+]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '允许来访的 IP 地址不能空哦, 否则就被禁止访问了.',
+    '__undefined__' => '请输入有效的客户端 IP 地址.',
+]);
+
+$input = $data->form->get(Form::FIELD_START);
+$input->setAttributes([
+    'class' => 'form-control',
+]);
+$this->formLocalMessage($input, [
+    '__undefined__' => '请输入有效的客户端生效日期.',
+]);
+
+$input = $data->form->get(Form::FIELD_EXPIRED);
+$input->setAttributes([
+    'class' => 'form-control',
+]);
+$this->formLocalMessage($input, [
+    '__undefined__' => '请输入有效的客户端失效日期.',
+]);
+
+
+$input = $data->form->get(Form::FIELD_API);
+$input->setAttributes([
+    //'class' => 'form-control',
+]);
+$input->setValueOptions($data->apiList);
+
+
+$data->form->get(Form::FIELD_SUBMIT)->setAttributes(['class'=>'btn btn-primary']);
+
+$data->form->prepare();
+
+?>
+
+<style type="text/css">
+    .panel-body > .checkbox > label {
+        display: block;
+        padding-bottom: 10px;
+    }
+</style>
+
+<div class="row">
+    <div class="col-lg-6">
+
+        <?php echo $this->form()->openTag($data->form); ?>
+
+        <div class="form-group">
+            <?php echo $this->formElement($data->form->get(Form::FIELD_CSRF)); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($data->form->get(Form::FIELD_NAME), '设置客户端名称'); ?>
+            <?php echo $this->formElement($data->form->get(Form::FIELD_NAME)); ?>
+            <?php echo $this->formElementErrors($data->form->get(Form::FIELD_NAME)); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($data->form->get(Form::FIELD_DOMAIN), '允许来访的域名'); ?>
+            <?php echo $this->formElement($data->form->get(Form::FIELD_DOMAIN)); ?>
+            <p class="text-muted">
+                <small>
+                    域名格式: <strong>www.example.com</strong> 或 <strong>example.com</strong>
+                    不限制域名请填写: <strong class="text-info">*</strong>
+                </small>
+            </p>
+            <?php echo $this->formElementErrors($data->form->get(Form::FIELD_DOMAIN)); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($data->form->get(Form::FIELD_IP), '允许来访的IP地址'); ?>
+            <?php echo $this->formElement($data->form->get(Form::FIELD_IP)); ?>
+            <p class="text-muted">
+                <small>
+                    IP 地址格式: <strong>xxx.xxx.xxx.xxx</strong>
+                    不限制 IP 请填写: <strong class="text-info">*</strong>
+                </small>
+            </p>
+            <?php echo $this->formElementErrors($data->form->get(Form::FIELD_IP)); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($data->form->get(Form::FIELD_START), '允许客户端访问的开始时间'); ?>
+            <?php echo $this->formElement($data->form->get(Form::FIELD_START)); ?>
+            <p class="text-muted">
+                <small>
+                    日期格式示例: <strong><?php echo date('Y-m-d'); ?></strong>
+                </small>
+            </p>
+            <?php echo $this->formElementErrors($data->form->get(Form::FIELD_START)); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($data->form->get(Form::FIELD_EXPIRED), '允许客户端访问的结束时间'); ?>
+            <?php echo $this->formElement($data->form->get(Form::FIELD_EXPIRED)); ?>
+            <p class="text-muted">
+                <small>日期格式示例: <strong><?php echo date('Y-m-d', strtotime("+7 day")); ?></strong></small>
+            </p>
+            <?php echo $this->formElementErrors($data->form->get(Form::FIELD_EXPIRED)); ?>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">允许该客户端访问的接口列表</div>
+            <div class="panel-body">
+                <div class="checkbox">
+                    <?php echo $this->formElement($data->form->get(Form::FIELD_API)); ?>
+                </div>
+                <?php echo $this->formElementErrors($data->form->get(Form::FIELD_API)); ?>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formElement($data->form->get(Form::FIELD_SUBMIT)); ?>
+        </div>
+
+        <?php echo $this->form()->closeTag(); ?>
+
+    </div>
+</div>

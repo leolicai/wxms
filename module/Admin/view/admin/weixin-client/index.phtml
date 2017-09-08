@@ -9,3 +9,75 @@ $this->adminSideTreeMenu()->setActiveID($data->activeID);
 
 ?>
 
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <p>
+            <a class="btn btn-default" href="<?php echo $this->url('admin/weixin-client', ['action'=>'add', 'key' => $data->weixin->getWxID()]); ?>"><i class="fa fa-plus fa-fw"></i> 添加客户端</a>
+        </p>
+        <?php if (empty($clients)) { ?>
+
+        <?php } else { ?>
+            <div class="row">
+                <div class="col-lg-12">
+                    <?php if(count($clients) < 9) { ?>
+                        <p>
+                            <a class="btn btn-default btn-sm" href="<?php echo $this->url('admin/weChatClient', ['action'=>'add']); ?>"><i class="fa fa-plus fa-fw"></i> 添加客户端</a>
+                        </p>
+                    <?php } ?>
+                    <table class="table table-striped">
+                        <tr>
+                            <th>客户端有效期</th>
+                            <th>访问控制(允许的域名及 IP)</th>
+                            <th>授权的接口列表</th>
+                            <th>操作</th>
+                        </tr>
+                        <?php
+                        foreach ($clients as $client) {
+                            if ($client instanceof \WeChat\Entity\Client) {
+                                ?>
+                                <tr>
+                                    <td>
+                                        名称: <strong><?php echo $client->getName(); ?></strong><br>
+                                        生效: <span class="btn btn-success btn-xs"><?php echo date('Y-m-d H:i:s', $client->getActiveTime()); ?></span><br>
+                                        失效: <span class="btn btn-warning btn-xs"><?php echo date('Y-m-d H:i:s', $client->getExpireTime()); ?></span>
+                                    </td>
+                                    <td>
+                                        标识: <strong><?php echo $client->getIdentifier(); ?></strong><br>
+                                        域名: <?php echo 'anonymous.com' == $client->getDomain() ? '不限制' : $client->getDomain();  ?><br>
+                                        IP: <?php echo '0.0.0.0' == $client->getIp() ? '不限制' : $client->getIp(); ?>
+                                    </td>
+                                    <td>
+                                        <?php if(empty($client->getApiList())) { ?>
+                                            <span class="btn btn-danger btn-xs">无授权任何接口</span>
+                                        <?php } else {
+                                            $api_list = explode(',', $client->getApiList());
+                                            foreach ($api_list as $item) {
+                                                if(isset($apis[$item])) {
+                                                    ?>
+                                                    <span class="btn btn-success btn-xs"><?php echo $apis[$item]; ?></span><br>
+                                                <?php } } } ?>
+                                    </td>
+                                    <td>
+                                        <a class="delete" href="<?php echo $this->url('admin/weChatClient', ['action' => 'delete', 'key' => $client->getId()]); ?>">删除</a><br>
+                                        <a>&nbsp;</a><br>
+                                        <a href="<?php echo $this->url('admin/weChatClient', ['action' => 'apilist', 'key' => $client->getId()]); ?>">查看 API</a>
+                                    </td>
+                                </tr>
+
+                            <?php } } ?>
+
+                    </table>
+
+                </div>
+            </div>
+
+        <?php } ?>
+    </div>
+</div>
+
+<?php
+//echo $this->pagination()->render();
+?>
+
