@@ -10,6 +10,7 @@
 namespace Weixin\Entity;
 
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 
@@ -95,6 +96,17 @@ class Weixin
      */
     private $wxCreated;
 
+    /**
+     * @var Client[]|ArrayCollection
+     * @ORM\OneToMany(targetEntity="Weixin\Entity\Client", mappedBy="clientWeixin", cascade={"remove"})
+     */
+    private $wxClients;
+
+
+    public function __construct()
+    {
+        $this->wxClients = new ArrayCollection();
+    }
 
 
     /**
@@ -263,6 +275,22 @@ class Weixin
     public function setWxCreated($wxCreated)
     {
         $this->wxCreated = $wxCreated;
+    }
+
+    /**
+     * @return ArrayCollection|Client[]
+     */
+    public function getWxClients()
+    {
+        return $this->wxClients;
+    }
+
+    /**
+     * @param ArrayCollection|Client[] $wxClients
+     */
+    public function setWxClients($wxClients)
+    {
+        $this->wxClients = $wxClients;
     }
 
 }

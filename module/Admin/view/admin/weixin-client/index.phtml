@@ -1,0 +1,11 @@
+<?php
+
+if (! $data->weixin instanceof \Weixin\Entity\Weixin) {
+    throw new \Admin\Exception\RuntimeException('Invalid weixin object');
+}
+
+$this->adminPageTitleBar('公众号客户端管理', $data->weixin->getWxName());
+$this->adminSideTreeMenu()->setActiveID($data->activeID);
+
+?>
+

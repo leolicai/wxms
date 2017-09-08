@@ -20,6 +20,7 @@ return [
         'factories' => [
             Controller\IndexController::class => InvokableFactory::class,
             Controller\MessageController::class => InvokableFactory::class,
+            Controller\ApiController::class => InvokableFactory::class,
         ],
     ],
 
@@ -27,6 +28,7 @@ return [
     'service_manager' => [
         'factories' => [
             Service\WeixinManager::class => EntityManagerFactory::class,
+            Service\WeixinService::class => Service\Factory\WeixinServiceFactory::class,
         ],
     ],
 
