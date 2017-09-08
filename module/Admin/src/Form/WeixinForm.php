@@ -22,6 +22,7 @@ class WeixinForm extends BaseForm
 
     const FIELD_APPID = 'appid';
     const FIELD_APPSECRET = 'appsecret';
+    const FIELD_NAME = 'name';
 
     /**
      * @var WeixinManager
@@ -75,10 +76,26 @@ class WeixinForm extends BaseForm
 
     }
 
+    /**
+     * Form field name
+     */
+    private function formFieldName()
+    {
+        $validators = [
+            Factory::StringLength(2, 15),
+        ];
+
+        $this->addTextElement(self::FIELD_NAME, true, $validators);
+    }
+
+
     public function addElements()
     {
-        $this->formFieldAppID();
+        if (! $this->weixin instanceof Weixin) {
+            $this->formFieldAppID();
+        }
         $this->formFieldAppSecret();
+        $this->formFieldName();
     }
 
 }

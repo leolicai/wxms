@@ -19,6 +19,34 @@ class WeixinManager extends BaseManager
 {
 
     /**
+     * @return int
+     */
+    public function getWeixinCount()
+    {
+        return $this->getWeixinRepository()->getWeixinCount();
+    }
+
+    /**
+     * @param int $page
+     * @param int $size
+     * @return Weixin[]
+     */
+    public function getWeixinLimitByPage($page = 1, $size = 10)
+    {
+        return $this->getWeixinRepository()->getWeixinByLimitPage($page, $size);
+    }
+
+    /**
+     * @param $wxID
+     * @return null|object|Weixin
+     */
+    public function getWeixin($wxID)
+    {
+        return $this->getWeixinRepository()->find($wxID);
+    }
+
+
+    /**
      * @param $appid
      * @return null|object|Weixin
      */
@@ -33,6 +61,15 @@ class WeixinManager extends BaseManager
     public function saveModifiedWeixin(Weixin $weixin)
     {
         $this->getEntityManager()->persist($weixin);
+        $this->getEntityManager()->flush();
+    }
+
+    /**
+     * @param Weixin $weixin
+     */
+    public function removeWeixin(Weixin $weixin)
+    {
+        $this->getEntityManager()->remove($weixin);
         $this->getEntityManager()->flush();
     }
 

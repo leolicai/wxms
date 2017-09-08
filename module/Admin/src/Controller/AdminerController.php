@@ -41,9 +41,9 @@ class AdminerController extends AdminBaseController
         $pageUrlTpl = $this->url()->fromRoute('admin/adminer', ['action' => 'index', 'key' => '%d']);
         $pagination->setPage($page)->setSize($size)->setCount($count)->setUrlTpl($pageUrlTpl);
 
-        $entites = $adminerManager->getAdminersByLimitPage($page, $size);
+        $entities = $adminerManager->getAdminersByLimitPage($page, $size);
 
-        $this->addResultData('adminers', $entites);
+        $this->addResultData('adminers', $entities);
         $this->addResultData('activeID', __METHOD__);
     }
 

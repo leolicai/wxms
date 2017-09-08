@@ -37,6 +37,12 @@ class Weixin
 
     /**
      * @var string
+     * @ORM\Column(name="wx_name", type="string", length=45)
+     */
+    private $wxName = '';
+
+    /**
+     * @var string
      * @ORM\Column(name="wx_appid", type="string", length=45, options={"fixed" = true})
      */
     private $wxAppID = '';
@@ -97,6 +103,22 @@ class Weixin
     public function getWxID()
     {
         return $this->wxID;
+    }
+
+    /**
+     * @return string
+     */
+    public function getWxName()
+    {
+        return $this->wxName;
+    }
+
+    /**
+     * @param string $wxName
+     */
+    public function setWxName($wxName)
+    {
+        $this->wxName = $wxName;
     }
 
     /**
