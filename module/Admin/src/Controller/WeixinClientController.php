@@ -115,8 +115,9 @@ class WeixinClientController extends AdminBaseController
                 $client->setClientExpired(new \DateTime($data[WeixinClientForm::FIELD_EXPIRED]));
                 $client->setClientCreated(new \DateTime());
                 $client->setClientApi($selectedApis);
+                $client->setClientWeixin($weixin);
 
-                $weixinManager->saveModifiedWeixinClient($weixin, $client);
+                $weixinManager->saveModifiedClient($client);
 
                 $this->go(
                     '客户端已创建',

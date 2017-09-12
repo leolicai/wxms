@@ -12,8 +12,10 @@ namespace Weixin\Service;
 
 use Application\Service\BaseManager;
 use Weixin\Entity\Client;
+use Weixin\Entity\Menu;
 use Weixin\Entity\Weixin;
 use Weixin\Repository\ClientRepository;
+use Weixin\Repository\MenuRepository;
 use Weixin\Repository\WeixinRepository;
 
 
@@ -68,14 +70,42 @@ class WeixinManager extends BaseManager
     }
 
 
+    /**
+     * @param $menuID
+     * @return null|object|Menu
+     */
+    public function getMenu($menuID)
+    {
+        return $this->getMenuRepository()->find($menuID);
+    }
+
+
 
     /**
-     * @param Weixin $weixin
+     * @param Menu $menu
+     */
+    public function saveModifiedMenu(Menu $menu)
+    {
+        $this->getEntityManager()->persist($menu);
+        $this->getEntityManager()->flush();
+    }
+
+    /**
+     * @param Menu $menu
+     */
+    public function removeMenu(Menu $menu)
+    {
+        $this->getEntityManager()->remove($menu);
+        $this->getEntityManager()->flush();
+    }
+
+
+
+    /**
      * @param Client $client
      */
-    public function saveModifiedWeixinClient(Weixin $weixin, Client $client)
+    public function saveModifiedClient(Client $client)
     {
-        $client->setClientWeixin($weixin);
         $this->getEntityManager()->persist($client);
         $this->getEntityManager()->flush();
     }
@@ -88,6 +118,8 @@ class WeixinManager extends BaseManager
         $this->getEntityManager()->remove($client);
         $this->getEntityManager()->flush();
     }
+
+
 
     /**
      * @param Weixin $weixin
@@ -107,6 +139,9 @@ class WeixinManager extends BaseManager
         $this->getEntityManager()->flush();
     }
 
+
+
+
     /**
      * @return WeixinRepository | \Doctrine\ORM\EntityRepository
      */
@@ -121,5 +156,13 @@ class WeixinManager extends BaseManager
     private function getClientRepository()
     {
         return $this->getEntityManager()->getRepository(Client::class);
+    }
+
+    /**
+     * @return MenuRepository | \Doctrine\ORM\EntityRepository
+     */
+    private function getMenuRepository()
+    {
+        return $this->getEntityManager()->getRepository(Menu::class);
     }
 }

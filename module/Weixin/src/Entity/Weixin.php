@@ -102,10 +102,17 @@ class Weixin
      */
     private $wxClients;
 
+    /**
+     * @var Menu[] | ArrayCollection
+     * @ORM\OneToMany(targetEntity="Weixin\Entity\Menu", mappedBy="menuWeixin", cascade={"remove"})
+     */
+    private $wxMenus;
+
 
     public function __construct()
     {
         $this->wxClients = new ArrayCollection();
+        $this->wxMenus = new ArrayCollection();
     }
 
 
@@ -292,5 +299,23 @@ class Weixin
     {
         $this->wxClients = $wxClients;
     }
+
+    /**
+     * @return ArrayCollection|Menu[]
+     */
+    public function getWxMenus()
+    {
+        return $this->wxMenus;
+    }
+
+    /**
+     * @param ArrayCollection|Menu[] $wxMenus
+     */
+    public function setWxMenus($wxMenus)
+    {
+        $this->wxMenus = $wxMenus;
+    }
+
+
 
 }

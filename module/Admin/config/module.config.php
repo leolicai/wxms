@@ -24,6 +24,7 @@ return [
             Controller\AdminerController::class => InvokableFactory::class,
             Controller\WeixinController::class => InvokableFactory::class,
             Controller\WeixinClientController::class => InvokableFactory::class,
+            Controller\WeixinMenuController::class => InvokableFactory::class,
         ],
     ],
 
@@ -188,6 +189,22 @@ return [
                             ],
                             'defaults' => [
                                 'controller' => Controller\WeixinClientController::class,
+                                'action' => 'index',
+                            ],
+                        ],
+                    ],
+
+                    'weixin-menu' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => 'weixin-menu[/:action[/:key]][:suffix]',
+                            'constraints' => [
+                                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                                'key' => '[a-zA-Z0-9_\-]+',
+                                'suffix' => '(/|.html)',
+                            ],
+                            'defaults' => [
+                                'controller' => Controller\WeixinMenuController::class,
                                 'action' => 'index',
                             ],
                         ],
