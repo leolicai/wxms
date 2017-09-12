@@ -14,6 +14,7 @@ use Admin\Service\AdminerManager;
 use Admin\Service\AuthService;
 use Application\Controller\AppBaseController;
 use Weixin\Service\WeixinManager;
+use Weixin\Service\WeixinService;
 
 
 /**
@@ -22,6 +23,14 @@ use Weixin\Service\WeixinManager;
  */
 class AdminBaseController extends AppBaseController
 {
+
+    /**
+     * @return WeixinService
+     */
+    protected function appWeixinService()
+    {
+        return $this->appServiceManager(WeixinService::class);
+    }
 
     /**
      * @return WeixinManager

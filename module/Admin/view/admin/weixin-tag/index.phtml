@@ -1,0 +1,82 @@
+<?php
+
+if (! $data->weixin instanceof \Weixin\Entity\Weixin) {
+    throw new \Admin\Exception\RuntimeException('Invalid weixin object');
+}
+
+$this->adminPageTitleBar('公众号标签管理', $data->weixin->getWxName());
+$this->adminSideTreeMenu()->setActiveID($data->activeID);
+
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+
+$(function(){
+    
+    $("#pageModal").on("show.bs.modal", function() {
+        $(this).find(".modal-content").html('<div class="well well-lg text-center" style="margin:0;">处理中. 请稍等...</div>');
+    });
+    
+    $("#pageModal").on("hidden.bs.modal", function() {
+        $("#pageModal > div").removeClass("modal-sm");
+    });
+    
+    $(".import").click(function() {
+        if(confirm("确定需要导入公众号标签么? 这个需要与微信服务器同步数据, 可能需要点时间.")) {
+            $("#pageModal > div").addClass("modal-sm");
+            $('#pageModal').modal({
+                show: true,
+                keyboard: false,
+                backdrop: "static"
+            });
+            
+            var importApi = $(this).attr("href");
+            $.ajax({
+                url: importApi,
+                async: true,
+                cache: false,
+                global: false,
+                type: 'GET',
+                dataType: 'json',
+                complete: function(jqXHR, textStatus) {
+                    
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    alert('导入失败, 请重新再试!');
+                    location.reload(true);
+                },
+                success: function(data, textStatus, jqXHR) {
+                     $('#pageModal').modal('hide');
+                     location.reload(true);
+                }
+            });
+            
+            return false;
+        } 
+        $(this).blur();
+        return false;
+    });
+    
+});
+
+JS;
+$this->inlineScript()->captureEnd();
+
+?>
+
+<div class="row">
+    <div class="col-lg-12">
+        <p>
+            <a class="btn btn-default"
+               href="<?php echo $this->url('admin/weixin-tag', ['action'=>'add', 'key' => $data->weixin->getWxID()]); ?>">
+                <i class="fa fa-plus fa-fw"></i> 添加标签</a>
+            <span> &nbsp;&nbsp; </span>
+            <a class="btn btn-default import"
+               href="<?php echo $this->url('admin/weixin-tag', ['action'=>'import', 'key' => $data->weixin->getWxID()]); ?>">
+                <i class="fa fa-share fa-fw"></i> 导入公众号标签</a></a>
+        </p>
+
+
+
+    </div>
+</div>

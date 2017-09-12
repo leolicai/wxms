@@ -151,6 +151,12 @@ $this->inlineScript()->captureEnd();
                                     </li>
                                     <li class="divider"></li>
                                     <li>
+                                        <a href="<?php echo $this->url('admin/weixin-tag', ['action' => 'index', 'key' => $entity->getWxID()]); ?>">
+                                            <i class="fa fa-tags fa-fw" aria-hidden="true"></i> Tag 管理
+                                        </a>
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li>
                                         <a href="<?php echo $this->url('admin/weixin-menu', ['action' => 'index', 'key' => $entity->getWxID()]); ?>">
                                             <i class="fa fa-navicon fa-fw" aria-hidden="true"></i> 菜单管理
                                         </a>

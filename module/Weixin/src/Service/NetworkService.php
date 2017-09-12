@@ -177,9 +177,26 @@ class NetworkService
     public static function MenuExport($access_token)
     {
         $path = '/cgi-bin/menu/get?access_token=' . (string)$access_token;
-
         $res = self::SendGetRequest(self::WX_API_HOST . $path);
+        if (isset($res['errcode'])) {
+            throw new InvalidArgumentException(@$res['errmsg'], $res['errcode']);
+        }
 
+        return $res;
+    }
+
+
+    ///////////////////// Tag管理 /////////////////
+    /**
+     * 读取公众号已有标签
+     *
+     * @param $access_token
+     * @return array
+     */
+    public static function TagExport($access_token)
+    {
+        $path = '/cgi-bin/tags/get?access_token=' . (string)$access_token;
+        $res = self::SendGetRequest(self::WX_API_HOST . $path);
         if (isset($res['errcode'])) {
             throw new InvalidArgumentException(@$res['errmsg'], $res['errcode']);
         }

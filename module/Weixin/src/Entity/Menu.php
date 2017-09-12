@@ -32,27 +32,27 @@ class Menu
     /**
      * @var string
      * @ORM\Id
-     * @ORM\Column(name="menu_id", type="string", length=36, options={"fixed" = true})
+     * @ORM\Column(name="id", type="string", length=36, options={"fixed" = true})
      */
-    private $menuID;
+    private $id;
 
     /**
      * @var string
      * @ORM\Column(name="menu_name", type="string", length=45)
      */
-    private $menuName;
+    private $menuName = '';
 
     /**
      * @var string
-     * @ORM\Column(name="menu_menuid", type="string", length=45)
+     * @ORM\Column(name="menu_id", type="string", length=45)
      */
-    private $menuMenuID;
+    private $menuID = '';
 
     /**
      * @var string
      * @ORM\Column(name="menu_data", type="text", length=65535)
      */
-    private $menuData;
+    private $menuData = '';
 
     /**
      * @var integer
@@ -111,17 +111,17 @@ class Menu
     /**
      * @return string
      */
-    public function getMenuID()
+    public function getID()
     {
         return $this->menuID;
     }
 
     /**
-     * @param string $menuID
+     * @param string $id
      */
-    public function setMenuID($menuID)
+    public function setID($id)
     {
-        $this->menuID = $menuID;
+        $this->id = $id;
     }
 
     /**
@@ -143,17 +143,17 @@ class Menu
     /**
      * @return string
      */
-    public function getMenuMenuID()
+    public function getMenuID()
     {
-        return $this->menuMenuID;
+        return $this->menuID;
     }
 
     /**
-     * @param string $menuMenuID
+     * @param string $menuID
      */
-    public function setMenuMenuID($menuMenuID)
+    public function setMenuID($menuID)
     {
-        $this->menuMenuID = $menuMenuID;
+        $this->menuID = $menuID;
     }
 
     /**

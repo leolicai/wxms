@@ -13,9 +13,11 @@ namespace Weixin\Service;
 use Application\Service\BaseManager;
 use Weixin\Entity\Client;
 use Weixin\Entity\Menu;
+use Weixin\Entity\Tag;
 use Weixin\Entity\Weixin;
 use Weixin\Repository\ClientRepository;
 use Weixin\Repository\MenuRepository;
+use Weixin\Repository\TagRepository;
 use Weixin\Repository\WeixinRepository;
 
 
@@ -71,12 +73,41 @@ class WeixinManager extends BaseManager
 
 
     /**
-     * @param $menuID
+     * @param $id
      * @return null|object|Menu
      */
-    public function getMenu($menuID)
+    public function getMenu($id)
     {
-        return $this->getMenuRepository()->find($menuID);
+        return $this->getMenuRepository()->find($id);
+    }
+
+    /**
+     * @param $id
+     * @return null|object|Tag
+     */
+    public function getTag($id)
+    {
+        return $this->getTagRepository()->find($id);
+    }
+
+
+
+    /**
+     * @param Tag $tag
+     */
+    public function saveModifiedTag(Tag $tag)
+    {
+        $this->getEntityManager()->persist($tag);
+        $this->getEntityManager()->flush();
+    }
+
+    /**
+     * @param Tag $tag
+     */
+    public function removeTag(Tag $tag)
+    {
+        $this->getEntityManager()->remove($tag);
+        $this->getEntityManager()->flush();
     }
 
 
@@ -164,5 +195,13 @@ class WeixinManager extends BaseManager
     private function getMenuRepository()
     {
         return $this->getEntityManager()->getRepository(Menu::class);
+    }
+
+    /**
+     * @return TagRepository | \Doctrine\ORM\EntityRepository
+     */
+    private function getTagRepository()
+    {
+        return $this->getEntityManager()->getRepository(Tag::class);
     }
 }

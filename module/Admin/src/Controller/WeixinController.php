@@ -91,7 +91,7 @@ class WeixinController extends AdminBaseController
             $res = NetworkService::GetAccessToken($weixin->getWxAppID(), $weixin->getWxAppSecret());
 
             $accessToken = $res['access_token'];
-            $expiredIn = $res['expires_in'] + time() - 300;
+            $expiredIn = $res['expires_in'] + time() - 60;
 
             $weixin->setWxAccessToken($accessToken);
             $weixin->setWxAccessTokenExpired($expiredIn);

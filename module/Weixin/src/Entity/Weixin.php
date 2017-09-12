@@ -108,11 +108,18 @@ class Weixin
      */
     private $wxMenus;
 
+    /**
+     * @var Tag[] | ArrayCollection
+     * @ORM\OneToMany(targetEntity="Weixin\Entity\Tag", mappedBy="tagWeixin", cascade={"remove"})
+     */
+    private $wxTags;
+
 
     public function __construct()
     {
         $this->wxClients = new ArrayCollection();
         $this->wxMenus = new ArrayCollection();
+        $this->wxTags = new ArrayCollection();
     }
 
 
@@ -314,6 +321,22 @@ class Weixin
     public function setWxMenus($wxMenus)
     {
         $this->wxMenus = $wxMenus;
+    }
+
+    /**
+     * @return ArrayCollection|Tag[]
+     */
+    public function getWxTags()
+    {
+        return $this->wxTags;
+    }
+
+    /**
+     * @param ArrayCollection|Tag[] $wxTags
+     */
+    public function setWxTags($wxTags)
+    {
+        $this->wxTags = $wxTags;
     }
 
 
