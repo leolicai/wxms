@@ -10,6 +10,7 @@
 namespace Weixin\Service;
 
 
+use Weixin\Entity\Tag;
 use Weixin\Entity\Weixin;
 use Weixin\Exception\InvalidArgumentException;
 
@@ -29,25 +30,32 @@ class WeixinService
     /**
      * Get the access token
      *
-     * @param $wxID
+     * @param mixed $wxID
      * @return string
      */
     public function getAccessToken($wxID)
     {
-        $weixin = $this->weixinManager->getWeixin($wxID);
-        if (! $weixin instanceof Weixin) {
-            throw new InvalidArgumentException('Invalid weixin ID');
+        if (is_scalar($wxID)) {
+            $weixinEntity = $this->weixinManager->getWeixin($wxID);
+            if (! $weixinEntity instanceof Weixin) {
+                throw new InvalidArgumentException('Invalid weixin ID');
+            }
+        } else {
+            if (! $wxID instanceof Weixin) {
+                throw new InvalidArgumentException('Invalid weixin object');
+            }
+            $weixinEntity = $wxID;
         }
 
-        $accessToken = $weixin->getWxAccessToken();
-        if (empty($accessToken) || $weixin->getWxAccessTokenExpired() < time()) { // Auto refresh token
+        $accessToken = $weixinEntity->getWxAccessToken();
+        if (empty($accessToken) || $weixinEntity->getWxAccessTokenExpired() < time()) { // Auto refresh token
 
-            $res = NetworkService::GetAccessToken($weixin->getWxAppID(), $weixin->getWxAppSecret());
+            $res = NetworkService::GetAccessToken($weixinEntity->getWxAppID(), $weixinEntity->getWxAppSecret());
 
             $expiredIn = $res['expires_in'] + time() - 60;
-            $weixin->setWxAccessToken($res['access_token']);
-            $weixin->setWxAccessTokenExpired($expiredIn);
-            $this->weixinManager->saveModifiedWeixin($weixin);
+            $weixinEntity->setWxAccessToken($res['access_token']);
+            $weixinEntity->setWxAccessTokenExpired($expiredIn);
+            $this->weixinManager->saveModifiedWeixin($weixinEntity);
 
             return $res['access_token'];
         }
@@ -58,13 +66,54 @@ class WeixinService
     /**
      * Export weixin platform tags
      *
-     * @param $wxID
+     * @param mixed $wxID
      * @return array
      */
-    public function getTags($wxID)
+    public function tagsExport($wxID)
     {
         $token = $this->getAccessToken($wxID);
         return NetworkService::TagExport($token);
     }
+
+    /**
+     * Create a new tag
+     *
+     * @param mixed $wxID
+     * @param string $tag
+     * @return array
+     */
+    public function tagCreate($wxID, $tag)
+    {
+        $token = $this->getAccessToken($wxID);
+        return NetworkService::TagCreate($token, $tag);
+    }
+
+    /**
+     * Update a tag
+     *
+     * @param mixed $wx
+     * @param Tag $tag
+     * @return bool
+     */
+    public function tagUpdate($wx, Tag $tag)
+    {
+        $token = $this->getAccessToken($wx);
+        return NetworkService::TagUpdate($token, $tag->getTagID(), $tag->getTagName());
+    }
+
+    /**
+     * Delete a tag
+     *
+     * @param mixed $wx
+     * @param Tag $tag
+     * @return bool
+     */
+    public function tagDelete($wx, Tag $tag)
+    {
+        $token = $this->getAccessToken($wx);
+        return NetworkService::TagDelete($token, $tag->getTagID());
+    }
+
+
 
 }

@@ -204,6 +204,71 @@ class NetworkService
         return $res;
     }
 
+    /**
+     * 创建 Tag
+     *
+     * @param string $access_token
+     * @param string $tag
+     * @return array
+     */
+    public static function TagCreate($access_token, $tag)
+    {
+        $path = '/cgi-bin/tags/create?access_token=' . (string)$access_token;
+        $data = new \stdClass();
+        $tagObj = new \stdClass();
+        $tagObj->name = (string)$tag;
+        $data->tag = $tagObj;
+        $res = self::SendPostRequest(self::WX_API_HOST . $path, json_encode($data, JSON_UNESCAPED_UNICODE));
+        if (isset($res['errcode'])) {
+            throw new InvalidArgumentException(@$res['errmsg'], $res['errcode']);
+        }
+        return $res;
+    }
+
+    /**
+     * 编辑更新 Tag
+     *
+     * @param string $access_token
+     * @param string $tag_id
+     * @param string $tag_name
+     * @return bool
+     */
+    public static function TagUpdate($access_token, $tag_id, $tag_name)
+    {
+        $path = '/cgi-bin/tags/update?access_token=' . (string)$access_token;
+        $data = new \stdClass();
+        $tagObj = new \stdClass();
+        $tagObj->name = (string)$tag_name;
+        $tagObj->id = (int)$tag_id;
+        $data->tag = $tagObj;
+        $res = self::SendPostRequest(self::WX_API_HOST . $path, json_encode($data, JSON_UNESCAPED_UNICODE));
+        if (isset($res['errcode']) && $res['errcode'] != 0) {
+            throw new InvalidArgumentException(@$res['errmsg'], $res['errcode']);
+        }
+        return true;
+    }
+
+    /**
+     * 删除一个 Tag, 只能删除标签 count 小于10万的标签
+     *
+     * @param string $access_token
+     * @param int $tag_id
+     * @return bool
+     */
+    public static function TagDelete($access_token, $tag_id)
+    {
+        $path = '/cgi-bin/tags/delete?access_token=' . (string)$access_token;
+        $data = new \stdClass();
+        $tagObj = new \stdClass();
+        $tagObj->id = (int)$tag_id;
+        $data->tag = $tagObj;
+        $res = self::SendPostRequest(self::WX_API_HOST . $path, json_encode($data, JSON_UNESCAPED_UNICODE));
+        if (isset($res['errcode']) && $res['errcode'] != 0) {
+            throw new InvalidArgumentException(@$res['errmsg'], $res['errcode']);
+        }
+        return true;
+    }
+
 
     ///////////////////// 用户管理 /////////////////
     /**

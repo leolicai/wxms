@@ -11,6 +11,7 @@ namespace Admin\Controller;
 
 
 use Admin\Exception\InvalidArgumentException;
+use Admin\Form\WeixinTagForm;
 use Ramsey\Uuid\Uuid;
 use Weixin\Entity\Tag;
 use Weixin\Entity\Weixin;
@@ -56,7 +57,7 @@ class WeixinTagController extends AdminBaseController
         $localTags = $weixin->getWxTags();
 
         $weixinService = $this->appWeixinService();
-        $tags = $weixinService->getTags($wxID);
+        $tags = $weixinService->tagsExport($weixin);
         $newTags = [];
         foreach (@(array)$tags['tags'] as $item) {
             $newTags[$item['id']] = $item;
@@ -101,7 +102,26 @@ class WeixinTagController extends AdminBaseController
      */
     public function deleteAction()
     {
-        //todo
+        $id = $this->params()->fromRoute('key', '');
+
+        $weixinManager = $this->appWeixinManager();
+        $tag = $weixinManager->getTag($id);
+        if (! $tag instanceof Tag) {
+            throw new InvalidArgumentException('Invalid tag ID');
+        }
+
+        $weixinService = $this->appWeixinService();
+        $weixinService->tagDelete($tag->getTagWeixin(), $tag);
+
+        $weixinManager->removeTag($tag);
+
+        $this->go(
+            'Tag 已删除',
+            'Tag 已经删除. 已同步删除微信公众号平台该 Tag.',
+            $this->url()->fromRoute('admin/weixin-tag', ['action' => 'index', 'key' => $tag->getTagWeixin()->getWxID()])
+        );
+        return $this->layout()->setTerminal(true);
+
     }
 
     /**
@@ -110,7 +130,43 @@ class WeixinTagController extends AdminBaseController
      */
     public function addAction()
     {
-        //todo
+        $wxID = (int)$this->params()->fromRoute('key', 0);
+
+        $weixinManager = $this->appWeixinManager();
+        $weixin = $weixinManager->getWeixin($wxID);
+        if (! $weixin instanceof Weixin) {
+            throw new InvalidArgumentException('Invalid weixin identity');
+        }
+
+        $form = new WeixinTagForm();
+        if($this->getRequest()->isPost()) {
+            $form->setData($this->params()->fromPost());
+            if ($form->isValid()) {
+                $data = $form->getData();
+
+                $weixinService = $this->appWeixinService();
+                $res = $weixinService->tagCreate($weixin, $data[WeixinTagForm::FIELD_NAME]);
+
+                $tag = new Tag();
+                $tag->setId(Uuid::uuid1()->toString());
+                $tag->setTagID($res['tag']['id']);
+                $tag->setTagName($res['tag']['name']);
+                $tag->setTagWeixin($weixin);
+
+                $weixinManager->saveModifiedTag($tag);
+
+                $this->go(
+                    'Tag 已创建',
+                    'Tag 已经创建完成, 并且已经同步到微信公众号平台.',
+                    $this->url()->fromRoute('admin/weixin-tag', ['action' => 'index', 'key' => $weixin->getWxID()])
+                );
+                return $this->layout()->setTerminal(true);
+            }
+        }
+
+        $this->addResultData('form', $form);
+        $this->addResultData('weixin', $weixin);
+        $this->addResultData('activeID', WeixinController::class);
     }
 
     /**
@@ -119,7 +175,38 @@ class WeixinTagController extends AdminBaseController
      */
     public function editAction()
     {
-        //todo
+        $id = $this->params()->fromRoute('key', '');
+
+        $weixinManager = $this->appWeixinManager();
+        $tag = $weixinManager->getTag($id);
+        if (! $tag instanceof Tag) {
+            throw new InvalidArgumentException('Invalid tag ID');
+        }
+
+        $form = new WeixinTagForm();
+        if($this->getRequest()->isPost()) {
+            $form->setData($this->params()->fromPost());
+            if ($form->isValid()) {
+                $data = $form->getData();
+                $newName = $data[WeixinTagForm::FIELD_NAME];
+                if ($tag->getTagName() != $newName) {
+                    $tag->setTagName($newName);
+                    $weixinService = $this->appWeixinService();
+                    $weixinService->tagUpdate($tag->getTagWeixin(), $tag);
+                    $weixinManager->saveModifiedTag($tag);
+                }
+                $this->go(
+                    'Tag 已更新',
+                    'Tag 已经更新. 并且已经同步到微信公众号平台.',
+                    $this->url()->fromRoute('admin/weixin-tag', ['action' => 'index', 'key' => $tag->getTagWeixin()->getWxID()])
+                );
+                return $this->layout()->setTerminal(true);
+            }
+        }
+
+        $this->addResultData('form', $form);
+        $this->addResultData('tag', $tag);
+        $this->addResultData('activeID', WeixinController::class);
     }
 
 }

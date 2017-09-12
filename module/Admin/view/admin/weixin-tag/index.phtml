@@ -57,6 +57,14 @@ $(function(){
         return false;
     });
     
+    $(".delete").click(function() {
+        if(confirm('确定要删除该标签?\\n公众号平台的该标签将被同步删除!')) {
+            return true;
+        }
+        $(this).blur();
+        return false;
+    });
+    
 });
 
 JS;
@@ -76,6 +84,48 @@ $this->inlineScript()->captureEnd();
                 <i class="fa fa-share fa-fw"></i> 导入公众号标签</a></a>
         </p>
 
+        <table class="table table-hover">
+            <tr>
+                <th>Tag ID</th>
+                <th>Tag Name</th>
+                <th>Tag Count</th>
+                <th>操作</th>
+            </tr>
+            <?php
+            $tags = $data->weixin->getWxTags();
+            foreach($tags as $tag) {
+                ?>
+                <tr>
+                    <td><?php echo $tag->getTagID(); ?></td>
+                    <td><?php echo $tag->getTagName(); ?></td>
+                    <td><?php echo $tag->getTagCount(); ?></td>
+                    <td>
+                        <ul class="nav nav-pills actions-list" role="tablist">
+                            <li role="presentation" class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                    操作 <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li>
+                                        <a href="<?php echo $this->url('admin/weixin-tag', ['action'=>'edit', 'key' => $tag->getId()]); ?>">
+                                            <i class="fa fa-edit fa-fw" aria-hidden="true"></i> 编辑标签
+                                        </a>
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <a class="delete" href="<?php echo $this->url('admin/weixin-tag', ['action'=>'delete', 'key' => $tag->getId()]); ?>">
+                                            <i class="fa fa-close fa-fw" aria-hidden="true"></i> 删除标签
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            <?php
+            }
+            ?>
+        </table>
 
 
     </div>
