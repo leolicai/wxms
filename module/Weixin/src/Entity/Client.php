@@ -23,6 +23,10 @@ use Doctrine\ORM\Mapping as ORM;
 class Client
 {
 
+    const DOMAIN_ALL = 'domain-all.com';
+    const IP_ALL = '0.0.0.0';
+
+
     /**
      * @var string
      * @ORM\Id
@@ -46,7 +50,7 @@ class Client
      * @var string
      * @ORM\Column(name="client_domain", type="string", length=255)
      */
-    private $cientDomain = '';
+    private $clientDomain = '';
 
     /**
      * @var string
@@ -116,7 +120,7 @@ class Client
      */
     public function getClientIp()
     {
-        return $this->clientIp;
+        return self::IP_ALL == $this->clientIp ? '*' : $this->clientIp;
     }
 
     /**
@@ -130,17 +134,17 @@ class Client
     /**
      * @return string
      */
-    public function getCientDomain()
+    public function getClientDomain()
     {
-        return $this->cientDomain;
+        return self::DOMAIN_ALL == $this->clientDomain ? '*' : $this->clientDomain;
     }
 
     /**
-     * @param string $cientDomain
+     * @param string $clientDomain
      */
-    public function setCientDomain($cientDomain)
+    public function setClientDomain($clientDomain)
     {
-        $this->cientDomain = $cientDomain;
+        $this->clientDomain = $clientDomain;
     }
 
     /**

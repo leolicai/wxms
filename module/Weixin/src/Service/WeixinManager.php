@@ -11,7 +11,9 @@ namespace Weixin\Service;
 
 
 use Application\Service\BaseManager;
+use Weixin\Entity\Client;
 use Weixin\Entity\Weixin;
+use Weixin\Repository\ClientRepository;
 use Weixin\Repository\WeixinRepository;
 
 
@@ -55,6 +57,38 @@ class WeixinManager extends BaseManager
         return $this->getWeixinRepository()->findOneBy(['wxAppID' => $appid]);
     }
 
+
+    /**
+     * @param $clientID
+     * @return null|object|Client
+     */
+    public function getClient($clientID)
+    {
+        return $this->getClientRepository()->find($clientID);
+    }
+
+
+
+    /**
+     * @param Weixin $weixin
+     * @param Client $client
+     */
+    public function saveModifiedWeixinClient(Weixin $weixin, Client $client)
+    {
+        $client->setClientWeixin($weixin);
+        $this->getEntityManager()->persist($client);
+        $this->getEntityManager()->flush();
+    }
+
+    /**
+     * @param Client $client
+     */
+    public function removeClient(Client $client)
+    {
+        $this->getEntityManager()->remove($client);
+        $this->getEntityManager()->flush();
+    }
+
     /**
      * @param Weixin $weixin
      */
@@ -79,5 +113,13 @@ class WeixinManager extends BaseManager
     private function getWeixinRepository()
     {
         return $this->getEntityManager()->getRepository(Weixin::class);
+    }
+
+    /**
+     * @return ClientRepository | \Doctrine\ORM\EntityRepository
+     */
+    private function getClientRepository()
+    {
+        return $this->getEntityManager()->getRepository(Client::class);
     }
 }
