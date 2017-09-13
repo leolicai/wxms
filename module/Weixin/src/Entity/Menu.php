@@ -111,7 +111,7 @@ class Menu
     /**
      * @return string
      */
-    public function getID()
+    public function getId()
     {
         return $this->menuID;
     }
@@ -119,7 +119,7 @@ class Menu
     /**
      * @param string $id
      */
-    public function setID($id)
+    public function setId($id)
     {
         $this->id = $id;
     }

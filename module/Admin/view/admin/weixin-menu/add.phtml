@@ -162,27 +162,24 @@ $this->inlineScript()->captureEnd();
                             <hr>
                             <span>
                                 <label>菜单名称:</label>
-                                <input type="text" name="menuName[0]" placeholder="菜单名称">
+                                <input type="text" size="8" name="menuName[0]" placeholder="菜单名称">
                             </span>
                             <span style="padding: 0 20px;">
                                 <label>菜单类型:</label>
                                 <select class="top-menu-type" name="menuType[0]">
-                                    <option value="click">发送事件消息</option>
-                                    <option value="view">进入新页面</option>
-                                    <option value="scancode_push">扫码推事件</option>
-                                    <option value="scancode_waitmsg">扫码推事件且弹出“消息接收中”提示框</option>
-                                    <option value="pic_sysphoto">弹出系统拍照发图</option>
-                                    <option value="pic_photo_or_album">弹出拍照或者相册发图</option>
-                                    <option value="pic_weixin">弹出微信相册发图器</option>
-                                    <option value="location_select">弹出地理位置选择器</option>
-                                    <option value="media_id">下发素材消息</option>
-                                    <option value="view_limited">跳转图文消息URL</option>
+                                    <?php
+                                    foreach($data->type as $k => $v) {
+                                        ?>
+                                        <option value="<?php echo $k; ?>"><?php echo $v; ?></option>
+                                    <?php
+                                    }
+                                    ?>
                                     <option value="parent">一级菜单(含子菜单)</option>
                                 </select>
                             </span>
                             <span style="padding-right: 20px;">
-                                <label>KEY/URL:</label>
-                                <input type="text" name="menuValue[0]" placeholder="菜单的 KEY 或者指向的 URL">
+                                <label>值:</label>
+                                <input type="text" size="45" name="menuValue[0]" placeholder="KEY或URL,小程序URL,APPID和PATH用逗号隔开">
                             </span>
                             <span>
                                 <a class="add-top-menu text-success" href="#"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
@@ -193,26 +190,23 @@ $this->inlineScript()->captureEnd();
                                 <div class="form-inLine">
                                     <span>
                                         <label>子菜单名称:</label>
-                                        <input type="text" name="subMenuName[0][]" placeholder="子菜单名称">
+                                        <input type="text" size="8" name="subMenuName[0][]" placeholder="子菜单名称">
                                     </span>
                                     <span style="padding: 0 20px;">
                                         <label>子菜单类型:</label>
                                         <select class="sub-menu-type" name="subMenuType[0][]">
-                                            <option value="click">发送事件消息</option>
-                                            <option value="view">进入新页面</option>
-                                            <option value="scancode_push">扫码推事件</option>
-                                            <option value="scancode_waitmsg">扫码推事件且弹出“消息接收中”提示框</option>
-                                            <option value="pic_sysphoto">弹出系统拍照发图</option>
-                                            <option value="pic_photo_or_album">弹出拍照或者相册发图</option>
-                                            <option value="pic_weixin">弹出微信相册发图器</option>
-                                            <option value="location_select">弹出地理位置选择器</option>
-                                            <option value="media_id">下发素材消息</option>
-                                            <option value="view_limited">跳转图文消息URL</option>
+                                            <?php
+                                            foreach($data->type as $k => $v) {
+                                                ?>
+                                                <option value="<?php echo $k; ?>"><?php echo $v; ?></option>
+                                                <?php
+                                            }
+                                            ?>
                                         </select>
                                     </span>
                                     <span style="padding-right: 20px;">
-                                        <label>KEY/URL:</label>
-                                        <input type="text" name="subMenuValue[0][]" placeholder="子菜单的 KEY 或者指向的 URL">
+                                        <label>值:</label>
+                                        <input type="text" size="45" name="subMenuValue[0][]" placeholder="KEY或URL,小程序URL,APPID和PATH用逗号隔开">
                                     </span>
                                     <span>
                                         <a class="add-sub-menu text-success" href="#"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
@@ -263,9 +257,14 @@ $this->inlineScript()->captureEnd();
                             <label>设置用户标签</label>
                             <select name="menuForTag" class="form-control">
                                 <option value="" selected>不设置</option>
-                                <?php if(!empty($tags)) { foreach($tags as $tag) { if($tag instanceof \WeChat\Entity\Tag) { ?>
-                                    <option value="<?php echo $tag->getTagid(); ?>"><?php echo $tag->getTagname(); ?></option>
-                                <?php } } } ?>
+                                <?php
+                                $tags = $data->weixin->getWxTags();
+                                foreach ($tags as $tag) {
+                                    ?>
+                                    <option value="<?php echo $tag->getTagID(); ?>"><?php echo $tag->getTagName(); ?></option>
+                                    <?php
+                                }
+                                ?>
                             </select>
                         </div>
                         <div class="form-group">
@@ -275,9 +274,16 @@ $this->inlineScript()->captureEnd();
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>设置用户语音</label>
+                            <label>设置用户语言</label>
                             <select name="menuForLang" class="form-control">
                                 <option value="" selected>不设置</option>
+                                <?php
+                                foreach ($data->language as $k => $v) {
+                                    ?>
+                                    <option value="<?php echo $k; ?>"><?php echo $v; ?></option>
+                                <?php
+                                }
+                                ?>
                             </select>
                         </div>
                     </div>

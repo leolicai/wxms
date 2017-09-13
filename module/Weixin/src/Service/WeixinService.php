@@ -10,6 +10,7 @@
 namespace Weixin\Service;
 
 
+use Weixin\Entity\Menu;
 use Weixin\Entity\Tag;
 use Weixin\Entity\Weixin;
 use Weixin\Exception\InvalidArgumentException;
@@ -63,6 +64,76 @@ class WeixinService
     }
 
 
+
+    /**
+     * Create a conditional menu for wx platform
+     *
+     * @param $wx
+     * @param Menu $menu
+     * @return string
+     */
+    public function menuCreateConditional($wx, Menu $menu)
+    {
+        $token = $this->getAccessToken($wx);
+        return NetworkService::MenuCreateConditional($token, $menu->getMenuData());
+    }
+
+
+    /**
+     * Create a default menu for wx platform
+     *
+     * @param $wx
+     * @param Menu $menu
+     * @return true
+     */
+    public function menuCreateDefault($wx, Menu $menu)
+    {
+        $token = $this->getAccessToken($wx);
+        return NetworkService::MenuCreateDefault($token, $menu->getMenuData());
+    }
+
+
+    /**
+     * Remove a conditional menu from wx platform
+     *
+     * @param mix $wx
+     * @param string $menuID
+     * @return true
+     */
+    public function menuRemoveConditional($wx, $menuID)
+    {
+        $token = $this->getAccessToken($wx);
+        return NetworkService::MenuRemoveConditional($token, $menuID);
+    }
+
+
+    /**
+     * Remove all menus from wx platform
+     *
+     * @param $wx
+     * @return true
+     */
+    public function menuTrashed($wx)
+    {
+        $token = $this->getAccessToken($wx);
+        return NetworkService::MenuRemoveDefault($token);
+    }
+
+
+    /**
+     * Export all menus from weixin platform
+     *
+     * @param $wx
+     * @return array
+     */
+    public function menusExport($wx)
+    {
+        $token = $this->getAccessToken($wx);
+        return NetworkService::MenuExport($token);
+    }
+
+
+    ////////////////////// Tags API ////////////////
     /**
      * Export weixin platform tags
      *

@@ -1,0 +1,365 @@
+<?php
+$menu = $data->menu;
+if(!$menu instanceof \Weixin\Entity\Menu) {
+    throw new \Admin\Exception\InvalidArgumentException("Invalid weixin menu object");
+}
+
+$this->adminPageTitleBar('编辑菜单', $menu->getMenuName());
+$this->adminSideTreeMenu()->setActiveID($data->activeID);
+
+$json = json_decode($menu->getMenuData(), true);
+
+$menuForSex = '';
+$menuForPlatform = '';
+$menuForTag = '';
+$menuForCountry = '';
+$menuForProvince = '';
+$menuForCity = '';
+$menuForLang = '';
+
+if (isset($json['matchrule'])) {
+    if(isset($json['matchrule']['sex']) && !empty($json['matchrule']['sex'])) {
+        $menuForSex = $json['matchrule']['sex'];
+    }
+    if(isset($json['matchrule']['client_platform_type']) && !empty($json['matchrule']['client_platform_type'])) {
+        $menuForPlatform = $json['matchrule']['client_platform_type'];
+    }
+    if(isset($json['matchrule']['tag_id']) && !empty($json['matchrule']['tag_id'])) {
+        $menuForTag = $json['matchrule']['tag_id'];
+    }
+    if(isset($json['matchrule']['country']) && !empty($json['matchrule']['country'])) {
+        $menuForCountry = $json['matchrule']['country'];
+    }
+    if(isset($json['matchrule']['province']) && !empty($json['matchrule']['province'])) {
+        $menuForProvince = $json['matchrule']['province'];
+    }
+    if(isset($json['matchrule']['city']) && !empty($json['matchrule']['city'])) {
+        $menuForCity = $json['matchrule']['city'];
+    }
+    if(isset($json['matchrule']['language']) && !empty($json['matchrule']['language'])) {
+        $menuForLang = $json['matchrule']['language'];
+    }
+}
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+$(function () {
+    $(".top-menu-type").change(function () {
+        if("parent" == $(this).val()) {
+            $(this).parent().next("span").fadeOut();
+            $(this).parent().parent().children(".subMenus").fadeIn();
+        } else {
+            $(this).parent().next("span").fadeIn();
+            $(this).parent().parent().children(".subMenus").fadeOut();
+        }
+        $(this).blur();
+    });
+    
+    
+    $("#menuContainer").on("click", ".add-top-menu", function() {
+        $(this).blur();
+        
+        var topParent = $(this).parent().parent().parent();
+        var size = topParent.children().length;
+        
+        if(1 == size) { // First ele
+            var copyDom = $(this).parent().parent().clone(true, true);
+            copyDom.children("span").show();
+            copyDom.children(".subMenus").hide();
+            topParent.append(copyDom);
+            $(this).hide().next().show();
+        } else if(2 == size) {
+            $(this).hide().next().show();
+            var copyDom = $(this).parent().parent().clone(true, true);
+            copyDom.children("span").show();
+            copyDom.children(".subMenus").hide();
+            topParent.append(copyDom);
+        } else {
+            return false;
+        }
+        
+        //Fix input names
+        topParent.children().each(function(i){
+            var nameReg = /^([\w]+)(\[{1})(\d{1})(\]{1})(\[\])*$/;
+            
+            $(this).find("input").each(function() {
+                var name = $(this).attr("name");
+                var updatedName = name.replace(nameReg, "$1$2" + i + "$4$5");
+                $(this).attr("name", updatedName);
+            });
+            
+            $(this).find("select").each(function() {
+                var name = $(this).attr("name");
+                var updatedName = name.replace(nameReg, "$1$2" + i + "$4$5");
+                $(this).attr("name", updatedName);
+            });
+        });
+        
+        return false;
+    });
+     
+    $("#menuContainer").on("click", ".remove-top-menu", function() {
+        $(this).blur();
+        var topParent = $(this).parent().parent().parent();
+        $(this).parent().parent().remove();
+        var size = topParent.children().length;
+        if (1 == size) {
+            var span = topParent.children().first().children("span").last();
+            span.children().last().hide();
+            span.children().first().show();
+        }
+ 
+        return false;
+    });
+    
+      
+    $("#menuContainer").on("click", ".add-sub-menu", function() {
+        $(this).blur();
+        
+        var topParent = $(this).parent().parent().parent();
+        var size = topParent.children().length;
+        
+        if (4 == size) {
+            $(this).hide().next().show();
+            var copyDom = $(this).parent().parent().clone(true, true);
+            topParent.append(copyDom);
+            return false;
+        }
+        
+        if (size > 4) {
+            $(this).hide().next().show();
+            return false;
+        }
+        
+        var copyDom = $(this).parent().parent().clone(true, true);
+        topParent.append(copyDom);
+        
+        $(this).hide().next().show();
+   
+        return false;
+    });
+    
+         
+    $("#menuContainer").on("click", ".remove-sub-menu", function() {
+        $(this).blur();
+        var topParent = $(this).parent().parent().parent();
+        $(this).parent().parent().remove();
+        var size = topParent.children().length;
+        if (1 == size) {
+            var span = topParent.children().first().children("span").last();
+            span.children().last().hide();
+            span.children().first().show();
+        }
+        return false;
+    });
+    
+    $(".menu-category").change(function() {
+        var target = $(this).parent().next(".form-group");
+        if("none" == target.css("display")) {
+            target.fadeIn();
+        } else {
+            target.fadeOut();
+        }
+    });
+});
+JS;
+$this->inlineScript()->captureEnd();
+
+?>
+
+<style>
+    #menuContainer > div:first-child > hr {
+        display: none;
+    }
+    .subMenus > div {
+        margin-top: 15px;
+    }
+    .subMenus > div:first-child {
+        margin-top: 0;
+    }
+</style>
+
+<div class="row">
+    <div class="col-lg-12">
+
+        <form method="post" role="form" id="menu_form">
+            <div class="form-group">
+                <label>菜单名称</label>
+                <input type="text" class="form-control" name="menuTitle" placeholder="菜单名称" value="<?php echo $menu->getMenuName(); ?>">
+            </div>
+
+            <div class="form-group">
+                <div class="panel panel-default">
+                    <div id="menuContainer" class="panel-body">
+                        <?php $step = 0; foreach ($json['button'] as $k => $topMenu) { $step++; ?>
+
+                            <div class="form-inline">
+                                <hr>
+                                <span>
+                                <label>菜单名称:</label>
+                                <input type="text" size="8" name="menuName[<?php echo $k; ?>]" placeholder="菜单名称" value="<?php echo @$topMenu['name']; ?>">
+                            </span>
+                                <span style="padding: 0 20px;">
+                                <label>菜单类型:</label>
+                                <select class="top-menu-type" name="menuType[<?php echo $k; ?>]">
+                                    <?php
+                                    foreach($data->type as $typeK => $typeV) {
+                                        ?>
+                                        <option value="<?php echo $typeK; ?>"<?php echo $typeK == @$topMenu['type'] ? ' selected' : ''; ?>><?php echo $typeV; ?></option>
+                                        <?php
+                                    }
+                                    ?>
+                                    <option value="parent"<?php echo empty($topMenu['sub_button']) ? '' : ' selected'; ?>>一级菜单(含子菜单)</option>
+                                </select>
+                            </span>
+                                <span style="padding-right: 20px;<?php echo empty($topMenu['sub_button']) ? '':'display: none;'; ?>">
+                                <label>值:</label>
+                                <input type="text" size="45" name="menuValue[<?php echo $k; ?>]" value="<?php
+                                if ('miniprogram' == @$topMenu['type']) {
+                                    echo implode(',', [ @$topMenu['url'], @$topMenu['appid'], @$topMenu['pagepath'] ]);
+                                } else {
+                                    echo @$topMenu['media_id'] . @$topMenu['url'] . @$topMenu['key'];
+                                }
+                                ?>" placeholder="KEY或URL,小程序URL,APPID和PATH用逗号隔开">
+                            </span>
+                                <span>
+                            <?php if(1 == count($json['button'])) { ?>
+                                <a class="add-top-menu text-success" href="#"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                                <a class="remove-top-menu text-danger" style="display: none;" href="#"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                            <?php } else if(3 == count($json['button'])) { ?>
+                                <a class="add-top-menu text-success" style="display: none;" href="#"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                                <a class="remove-top-menu text-danger" href="#"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                            <?php } else { ?>
+                                <?php if($step == count($json['button'])) { ?>
+                                    <a class="add-top-menu text-success" href="#"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                                    <a class="remove-top-menu text-danger" style="display: none;" href="#"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                                <?php } else { ?>
+                                    <a class="add-top-menu text-success" style="display: none;" href="#"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                                    <a class="remove-top-menu text-danger" href="#"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                                <?php } ?>
+                            <?php } ?>
+                            </span>
+
+                                <div class="subMenus" style="padding: 20px 0 0 20px;<?php echo empty($topMenu['sub_button']) ? 'display: none;':''; ?>">
+                                    <?php for($i = 0; $i < 5; $i++) { $subMenus = @$topMenu['sub_button']; ?>
+                                        <div class="form-inLine">
+                                    <span>
+                                        <label>子菜单名称:</label>
+                                        <input type="text" size="8" name="subMenuName[<?php echo $k; ?>][]" value="<?php echo @$subMenus[$i]['name']; ?>" placeholder="子菜单名称">
+                                    </span>
+                                            <span style="padding: 0 20px;">
+                                        <label>子菜单类型:</label>
+                                        <select class="sub-menu-type" name="subMenuType[<?php echo $k; ?>][]">
+                                            <?php
+                                            foreach($data->type as $typeK => $typeV) {
+                                                ?>
+                                                <option value="<?php echo $typeK; ?>"<?php echo $typeK == @$subMenus[$i]['type'] ? ' selected' : ''; ?>><?php echo $typeV; ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </span>
+                                            <span style="padding-right: 20px;">
+                                        <label>值:</label>
+                                        <input type="text" size="45" name="subMenuValue[<?php echo $k; ?>][]" value="<?php
+                                        if ('miniprogram' == @$subMenus[$i]['type']) {
+                                            echo implode(',', [ @$subMenus[$i]['url'], @$subMenus[$i]['appid'], @$subMenus[$i]['pagepath'] ]);
+                                        } else {
+                                            echo @$subMenus[$i]['media_id'] . @$subMenus[$i]['url'] . @$subMenus[$i]['key'];
+                                        }
+                                        ?>" placeholder="KEY或URL,小程序URL,APPID和PATH用逗号隔开">
+                                    </span>
+                                            <span>
+                                        <a class="add-sub-menu text-success" style="display: none;" href="#"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                                        <a class="remove-sub-menu text-danger" href="#"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                                    </span>
+                                        </div>
+                                    <?php } ?>
+                                </div>
+
+                            </div>
+
+                        <?php } ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>菜单类型</label>
+                <select name="menuCategory" class="form-control menu-category">
+                    <?php
+                    $list = \Weixin\Entity\Menu::TypeStringList();
+                    foreach ($list as $k => $v) {
+                        ?>
+                        <option value="<?php echo $k; ?>"<?php echo $k == $menu->getMenuType() ? ' selected' : ''; ?>><?php echo $v; ?></option>
+                    <?php } ?>
+                </select>
+            </div>
+
+            <div class="form-group" style="<?php echo $menu->getType() != \WeChat\Entity\Menu::TYPE_CONDITIONAL ? 'display: none;' : ''; ?>">
+
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label>设置用户性别</label>
+                            <select name="menuForSex" class="form-control">
+                                <option value=""<?php echo "" == $menuForSex ? ' selected':''; ?>>不设置</option>
+                                <option value="1"<?php echo 1 == $menuForSex ? ' selected':''; ?>>男</option>
+                                <option value="2"<?php echo 2 == $menuForSex ? ' selected':''; ?>>女</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>设置手机系统</label>
+                            <select name="menuForPlatform" class="form-control">
+                                <option value=""<?php echo "" == $menuForPlatform ? ' selected':''; ?>>不设置</option>
+                                <option value="1"<?php echo 1 == $menuForPlatform ? ' selected':''; ?>>IOS</option>
+                                <option value="2"<?php echo 2 == $menuForPlatform ? ' selected':''; ?>>Android</option>
+                                <option value="3"<?php echo 3 == $menuForPlatform ? ' selected':''; ?>>Others</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>设置用户标签</label>
+                            <select name="menuForTag" class="form-control">
+                                <option value=""<?php echo '' == $menuForTag ? ' selected':''; ?>>不设置</option>
+                                <?php
+                                $tags = $menu->getMenuWeixin()->getWxTags();
+                                foreach ($tags as $tag) {
+                                    ?>
+                                    <option value="<?php echo $tag->getTagID(); ?>"<?php echo $tag->getTagID() == $menuForTag ? ' selected':''; ?>><?php echo $tag->getTagName(); ?></option>
+                                    <?php
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>设置用户地区</label>
+                            <select name="menuForRegion" class="form-control">
+                                <option value=""<?php echo "" == $menuForCountry ? ' selected':''; ?>>不设置</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>设置用户语音</label>
+                            <select name="menuForLang" class="form-control">
+                                <option value=""<?php echo '' == $menuForLang ? ' selected':''; ?>>不设置</option>
+                                <?php
+                                foreach ($data->language as $k => $v) {
+                                    ?>
+                                    <option value="<?php echo $k; ?>"<?php echo $k == $menuForLang ? ' selected':''; ?>><?php echo $v; ?></option>
+                                    <?php
+                                }
+                                ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="submit"></label>
+                <input type="submit" name="submit" class="btn btn-primary" id="name" value="Submit">
+            </div>
+        </form>
+
+    </div>
+</div>
+

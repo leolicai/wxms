@@ -49,6 +49,47 @@ return [
         ],
     ],
 
+    'weixin' => [
+        'menu' => [
+            'type' => [
+                'click' => '[click] 推送按钮事件',
+                'view' => '[view] 打开URL网页',
+                'miniprogram' => '[miniprogram] 打开微信小程序',
+                'scancode_push' => '[scancode_push] 打开扫码功能',
+                'scancode_waitmsg' => '[scancode_waitmsg] 打开扫码并咨询用户',
+                'pic_sysphoto' => '[pic_sysphoto] 打开相机拍照',
+                'pic_photo_or_album' => '[pic_photo_or_album] 打开拍照或相册选择器',
+                'pic_weixin' => '[pic_weixin] 打开微信相册',
+                'location_select' => '[location_select] 打开地理位置',
+                'media_id' => '[media_id] 读取素材信息',
+                'view_limited' => '[view_limited] 打开素材URL',
+            ],
+            'language' => [
+                'zh_CN' => '简体中文',
+                'zh_TW' => '繁体中文TW',
+                'zh_HK' => '繁体中文HK',
+                'en' => '英文',
+                'id' => '印尼',
+                'ms' => '马来',
+                'es' => '西班牙',
+                'ko' => '韩国',
+                'it' => '意大利',
+                'ja' => '日本',
+                'pl' => '波兰',
+                'pt' => '葡萄牙',
+                'ru' => '俄国',
+                'th' => '泰文',
+                'vi' => '越南',
+                'ar' => '阿拉伯语',
+                'hi' => '北印度',
+                'he' => '希伯来',
+                'tr' => '土耳其',
+                'de' => '德语',
+                'fr' => '法语',
+            ],
+        ],
+    ],
+
     'router' => [
         'routes' => [
             'wx_mp_verify' => [
