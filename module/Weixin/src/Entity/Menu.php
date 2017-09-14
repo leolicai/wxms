@@ -113,7 +113,7 @@ class Menu
      */
     public function getId()
     {
-        return $this->menuID;
+        return $this->id;
     }
 
     /**

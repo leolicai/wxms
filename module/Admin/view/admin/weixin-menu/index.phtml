@@ -7,6 +7,84 @@ if (! $data->weixin instanceof \Weixin\Entity\Weixin) {
 $this->adminPageTitleBar('公众号菜单管理', $data->weixin->getWxName());
 $this->adminSideTreeMenu()->setActiveID($data->activeID);
 
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+
+function ajaxCallRequest(ajaxApi) {
+    $("#pageModal > div").addClass("modal-sm");
+    $('#pageModal').modal({show: true, keyboard: false, backdrop: "static"});
+    
+    $.ajax({
+        url: ajaxApi,
+        async: true,
+        cache: false,
+        global: false,
+        type: 'GET',
+        dataType: 'json',
+        complete: function(jqXHR, textStatus) {},
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert('请求失败, 请重新再试!');
+            location.reload(true);
+        },
+        success: function(data, textStatus, jqXHR) {
+            $('#pageModal').modal('hide');
+            location.reload(true);
+        }
+    });
+};
+
+$(function(){
+    
+    $("#pageModal").on("show.bs.modal", function() {
+        $(this).find(".modal-content").html('<div class="well well-lg text-center" style="margin:0;">处理中. 请稍等...</div>');
+    });
+    
+    $("#pageModal").on("hidden.bs.modal", function() {
+        $("#pageModal > div").removeClass("modal-sm");
+    });
+    
+    $(".importMenu").click(function() {
+        $(this).blur();
+        if(confirm('确定要导入公众号菜单? 需要和微信服务器进行数据查询. 请耐心等待!')) {
+            ajaxCallRequest($(this).attr("href"));
+            return false;
+        }
+        return false;
+    });
+    
+    $(".trashMenu").click(function() {
+        $(this).blur();
+        ajaxCallRequest($(this).attr("href")); 
+        return false;
+    });
+    
+    $(".asyncMenu").click(function() {
+        $(this).blur();
+        ajaxCallRequest($(this).attr("href")); 
+        return false;
+    });
+    
+    $(".activeMenu").click(function() {
+        $(this).blur();
+        ajaxCallRequest($(this).attr("href"));
+        return false;
+    });
+    
+    $(".deleteMenu").click(function() {
+        $(this).blur();
+        if(confirm('确定要删除该菜单?')) {
+            ajaxCallRequest($(this).attr("href"));
+            return false;
+        }
+        return false;
+    });
+    
+});
+
+JS;
+$this->inlineScript()->captureEnd();
+
 ?>
 
 <div class="row">
@@ -16,10 +94,75 @@ $this->adminSideTreeMenu()->setActiveID($data->activeID);
                 href="<?php echo $this->url('admin/weixin-menu', ['action'=>'add', 'key' => $data->weixin->getWxID()]); ?>">
                 <i class="fa fa-plus fa-fw"></i> 添加菜单</a>
             <span> &nbsp;&nbsp; </span>
-            <a class="btn btn-default"
-               href="#">
+            <a class="btn btn-default importMenu"
+               href="<?php echo $this->url('admin/weixin-menu', ['action'=>'import', 'key' => $data->weixin->getWxID()]); ?>">
                 <i class="fa fa-share fa-fw"></i> 导入公众号菜单</a></a>
+            <span> &nbsp;&nbsp; </span>
+            <a class="btn btn-default trashMenu"
+               href="<?php echo $this->url('admin/weixin-menu', ['action'=>'trash', 'key' => $data->weixin->getWxID()]); ?>">
+                <i class="fa fa-trash fa-fw"></i> 清空公众号菜单</a></a>
+            <span> &nbsp;&nbsp; </span>
+            <a class="btn btn-default asyncMenu"
+               href="<?php echo $this->url('admin/weixin-menu', ['action'=>'async', 'key' => $data->weixin->getWxID()]); ?>">
+                <i class="fa fa-refresh fa-fw"></i> 同步公众号菜单</a></a>
         </p>
+
+        <table class="table table-hover">
+            <tr>
+                <th>菜单类型</th>
+                <th>菜单名称</th>
+                <th>菜单状态</th>
+                <th>操作</th>
+            </tr>
+            <?php
+            $menus = $data->weixin->getWxMenus();
+            foreach ($menus as $menu) {
+                ?>
+                <tr>
+                    <td><?php echo $menu->getTypeAsString(); ?></td>
+                    <td><?php echo $menu->getMenuName(); ?></td>
+                    <td>
+                        <span class="label label-<?php echo \Weixin\Entity\Menu::STATUS_ACTIVATED == $menu->getMenuStatus() ? 'success' : 'default'; ?>">
+                            <?php echo $menu->getStatusAsString(); ?>
+                        </span>
+                    </td>
+                    <td>
+                        <ul class="nav nav-pills actions-list" role="tablist">
+                            <li role="presentation" class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                    菜单操作 <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li>
+                                        <a href="<?php echo $this->url('admin/weixin-menu', ['action'=>'edit', 'key' => $menu->getId()]); ?>">
+                                            <i class="fa fa-edit fa-fw" aria-hidden="true"></i> 修改菜单
+                                        </a>
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <a class="activeMenu" href="<?php echo $this->url('admin/weixin-menu', ['action'=>'active', 'key' => $menu->getId()]); ?>">
+                                            <?php if($menu->getMenuStatus() == \Weixin\Entity\Menu::STATUS_ACTIVATED){ ?>
+                                            <i class="fa fa-close fa-fw" aria-hidden="true"></i> 停用菜单
+                                            <?php } else { ?>
+                                                <i class="fa fa-check fa-fw" aria-hidden="true"></i> 启用菜单
+                                            <?php } ?>
+                                        </a>
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <a class="deleteMenu" href="<?php echo $this->url('admin/weixin-menu', ['action'=>'delete', 'key' => $menu->getId()]); ?>">
+                                            <i class="fa fa-trash fa-fw" aria-hidden="true"></i> 删除菜单
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            <?php
+            }
+            ?>
+        </table>
 
 
 

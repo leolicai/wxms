@@ -36,6 +36,7 @@ class Module
         $sharedEventManager = $event->getApplication()->getEventManager()->getSharedManager();
         $sharedEventManager->attach(__NAMESPACE__, MvcEvent::EVENT_DISPATCH, [$this, 'onDispatchListener'], 100);
         $sharedEventManager->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH, [$this, 'onGlobalDispatchListener'], 0);
+        $sharedEventManager->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR, [$this, 'onGlobalDispatchErrorListener'], 0);
     }
 
 
@@ -165,6 +166,103 @@ class Module
                     }
                 }
                 return;
+            }
+
+            return;
+        }
+
+        return;
+    }
+
+
+
+    /**
+     * Application global listener
+     *
+     * @param MvcEvent $event
+     */
+    public function onGlobalDispatchErrorListener(MvcEvent $event)
+    {
+        $exception = $event->getParam('exception');
+        if(!($exception instanceof \Exception) && !($exception instanceof \Throwable)) {
+            return ;
+        }
+
+        $serviceManager = $event->getApplication()->getServiceManager();
+        $logger = $serviceManager->get('AppLogger');
+
+        $err = new \stdClass();
+        $err->code = $exception->getCode();
+        $err->message = $exception->getMessage();
+        //$err->file = $exception->getFile();
+        //$err->line = $exception->getLine();
+        //$err->trace = $exception->getTraceAsString();
+
+        $resultData = $event->getTarget()->getResultData();
+
+        $_forceType = @$resultData['type'];
+
+        // For some ajax request.
+        if (self::ACCEPT_TYPE_JSON == $_forceType) {
+            $content = json_encode($err, JSON_UNESCAPED_UNICODE);
+            $this->setQuickResponse($event, $content);
+            $logger->err(
+                __METHOD__ . PHP_EOL .
+                'Force response to application/json by action.' . PHP_EOL .
+                $content
+            );
+            return;
+        }
+
+        // For some thirty api request
+        if (self::ACCEPT_TYPE_PLAIN == $_forceType) {
+            $content = '[' . $err->code . ']' . $err->message;
+            $this->setQuickResponse($event, $content);
+            $logger->err(
+                __METHOD__ . PHP_EOL .
+                'Force response to text/plain by action.' . PHP_EOL .
+                $content
+            );
+            return;
+        }
+
+        $request = $event->getRequest();
+        if($request instanceof \Zend\Http\Request) {
+            if (!$request->getHeaders()->has('Accept')) {
+                $event->setResult($event->getResponse());
+                $logger->err(
+                    __METHOD__ . PHP_EOL .
+                    'Request header no include accept field. Disabled response the request.'
+                );
+                return;
+            }
+
+            $header = $request->getHeaders()->get('Accept');
+            if (! $header instanceof \Zend\Http\Header\HeaderInterface) {
+                $event->setResult($event->getResponse());
+                $logger->err(__METHOD__ . PHP_EOL . 'Invalid request accept header. Disabled response the request.');
+                return;
+            }
+
+            $accept = \Zend\Http\Header\Accept::fromString($header->toString());
+            $acceptFieldValue = $accept->getFieldValue();
+            $logger->debug(
+                __METHOD__ . PHP_EOL .
+                'The request accept header:' . PHP_EOL .
+                $accept->toString() . PHP_EOL .
+                'FieldValue:' . PHP_EOL .
+                $acceptFieldValue
+            );
+
+            if (self::ACCEPT_TYPE_JSON == $this->getAcceptFirstType($acceptFieldValue)) {
+                $content = json_encode($err, JSON_UNESCAPED_UNICODE);
+                $this->setQuickResponse($event, $content);
+                $logger->err(
+                    __METHOD__ . PHP_EOL .
+                    'The request accept type is JSON, use ' . self::ACCEPT_TYPE_JSON . ' response.' . PHP_EOL .
+                    $content
+                );
+                return ;
             }
 
             return;

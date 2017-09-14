@@ -142,11 +142,12 @@ class WeixinMenuController extends AdminBaseController
     public function asyncAction()
     {
         $this->setResultType(self::RESPONSE_JSON);
+
         $wxID = (int)$this->params()->fromRoute('key', 0);
 
         $wxManager = $this->appWeixinManager();
         $wx = $wxManager->getWeixin($wxID);
-        if (! $wx instanceof Menu) {
+        if (! $wx instanceof Weixin) {
             throw new InvalidArgumentException('Invalid wx id');
         }
 
