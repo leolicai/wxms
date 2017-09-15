@@ -1,0 +1,60 @@
+<?php
+
+if (! $data->weixin instanceof \Weixin\Entity\Weixin) {
+    throw new \Admin\Exception\RuntimeException('Invalid weixin object');
+}
+
+$this->adminPageTitleBar('公众号二维码管理', $data->weixin->getWxName());
+$this->adminSideTreeMenu()->setActiveID($data->activeID);
+
+?>
+
+<div class="row">
+    <div class="col-lg-12">
+        <p>
+            <a class="btn btn-default" href="<?php echo $this->url('admin/weixin-qrcode', ['action'=>'add', 'key' => $data->weixin->getWxID()]); ?>"><i class="fa fa-plus fa-fw"></i> 生成二维码</a>
+        </p>
+        <table class="table table-hover">
+            <tr>
+                <th>二维码名称</th>
+                <th>二维码类型</th>
+                <th>二维码SCENE</th>
+                <th>客户端失效时间</th>
+                <th>下载二维码</th>
+                <th>删除二维码</th>
+            </tr>
+            <?php
+            $qrcodes = $data->weixin->getWxQRCodes();
+            foreach ($qrcodes as $qrcode) {
+                ?>
+                <tr>
+                    <td height="50"><?php echo $qrcode->getQrcodeName(); ?></td>
+                    <td><?php echo $qrcode->getQrcodeTypeAsString(); ?></td>
+                    <td><?php echo $qrcode->getQrcodeScene(); ?></td>
+                    <td><?php echo \Weixin\Entity\QRCode::TYPE_PERSIST == $qrcode->getQrcodeType() ? '永久有效' : $qrcode->getQrcodeExpired()->format('Y-m-d'); ?></td>
+                    <td>
+                        <ul class="nav nav-pills actions-list" role="tablist">
+                            <li role="presentation" class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                    二维码下载 <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li>
+                                        <a href="#" target="_blank">
+                                            <i class="fa fa-link fa-fw" aria-hidden="true"></i> XXXXX
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </td>
+                    <td><a href="<?php echo $this->url('admin/weixin-qrcode', ['action' => 'delete', 'key' => $qrcode->getQrcodeID()]); ?>">删除二维码</a></td>
+                </tr>
+
+                <?php
+            }
+            ?>
+        </table>
+    </div>
+</div>
+

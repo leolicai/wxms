@@ -163,7 +163,7 @@ $this->inlineScript()->captureEnd();
                                     </li>
                                     <li class="divider"></li>
                                     <li>
-                                        <a href="#">
+                                        <a href="<?php echo $this->url('admin/weixin-qrcode', ['action' => 'index', 'key' => $entity->getWxID()]); ?>">
                                             <i class="fa fa-qrcode fa-fw" aria-hidden="true"></i> 二维码管理
                                         </a>
                                     </li>

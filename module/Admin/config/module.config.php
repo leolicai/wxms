@@ -26,6 +26,7 @@ return [
             Controller\WeixinClientController::class => InvokableFactory::class,
             Controller\WeixinMenuController::class => InvokableFactory::class,
             Controller\WeixinTagController::class => InvokableFactory::class,
+            Controller\WeixinQrcodeController::class => InvokableFactory::class,
         ],
     ],
 
@@ -222,6 +223,22 @@ return [
                             ],
                             'defaults' => [
                                 'controller' => Controller\WeixinMenuController::class,
+                                'action' => 'index',
+                            ],
+                        ],
+                    ],
+
+                    'weixin-qrcode' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => 'weixin-qrcode[/:action[/:key]][:suffix]',
+                            'constraints' => [
+                                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                                'key' => '[a-zA-Z0-9_\-]+',
+                                'suffix' => '(/|.html)',
+                            ],
+                            'defaults' => [
+                                'controller' => Controller\WeixinQrcodeController::class,
                                 'action' => 'index',
                             ],
                         ],

@@ -78,6 +78,24 @@ class QRCode
 
 
 
+    public static function TypeStringList()
+    {
+        return [
+            self::TYPE_TEMP => '临时二维码',
+            self::TYPE_PERSIST => '永久二维码',
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getQrcodeTypeAsString()
+    {
+        $list = self::TypeStringList();
+        return isset($list[$this->qrcodeType]) ? $list[$this->qrcodeType] : '未知类型二维码';
+    }
+
+
     /**
      * @return string
      */
