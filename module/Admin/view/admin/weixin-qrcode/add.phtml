@@ -1,0 +1,122 @@
+<?php
+
+use Admin\Form\WeixinQRCodeForm as Form;
+
+if (! $data->weixin instanceof \Weixin\Entity\Weixin) {
+    throw new \Admin\Exception\RuntimeException('Invalid wx object');
+}
+
+$this->adminPageTitleBar('申请公众号二维码', $data->weixin->getWxName());
+$this->adminSideTreeMenu()->setActiveID($data->activeID);
+
+
+$input = $data->form->get(Form::FIELD_NAME);
+$input->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => '二维码名称'
+]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '请设置好二维码的名称方便您日后管理!',
+    \Zend\Validator\StringLength::TOO_SHORT => '名字太短啦, 这样容易和其他的二维码重名哦.',
+    \Zend\Validator\StringLength::TOO_LONG => '名字太长, 感觉电脑屏幕都不够用了都.',
+]);
+
+$input = $data->form->get(Form::FIELD_TYPE);
+$input->setAttributes([
+    'class' => 'form-control qrcode-type',
+]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '请设置好二维码的类型.',
+]);
+
+$input = $data->form->get(Form::FIELD_EXPIRED);
+$input->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => '604800',
+]);
+$this->formLocalMessage($input, [
+    '__undefined__' => '请设置好二维码的失效时间.',
+]);
+
+$input =$data->form->get(Form::FIELD_SCENE);
+$input->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => '二维码参数',
+]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '请设置好二维码的参数, 这个非常重要.',
+    \Zend\Validator\Regex::NOT_MATCH => '请设置有效的二维码参数.',
+]);
+
+$data->form->get(Form::FIELD_SUBMIT)->setAttributes(['class'=>'btn btn-primary']);
+
+$data->form->prepare();
+
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+$(function () {
+    $(".qrcode-type").change(function () {
+        if("none" == $("#expired-row").css("display")) {
+            $("#expired-row").show();
+        } else {
+            $("#expired-row").hide();
+        }
+    });
+})
+JS;
+$this->inlineScript()->captureEnd();
+
+
+?>
+
+
+<div class="row">
+    <div class="col-lg-6">
+
+        <?php echo $this->form()->openTag($data->form); ?>
+
+        <div class="form-group">
+            <?php echo $this->formElement($data->form->get(Form::FIELD_CSRF)); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($data->form->get(Form::FIELD_NAME), '设置二维码名称'); ?>
+            <?php echo $this->formElement($data->form->get(Form::FIELD_NAME)); ?>
+            <?php echo $this->formElementErrors($data->form->get(Form::FIELD_NAME)); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($data->form->get(Form::FIELD_TYPE), '设置二维码类型'); ?>
+            <?php echo $this->formElement($data->form->get(Form::FIELD_TYPE)); ?>
+            <?php echo $this->formElementErrors($data->form->get(Form::FIELD_TYPE)); ?>
+        </div>
+
+        <div class="form-group" id="expired-row">
+            <?php echo $this->formLabel($data->form->get(Form::FIELD_EXPIRED), '设置二维码有效时间'); ?>
+            <?php echo $this->formElement($data->form->get(Form::FIELD_EXPIRED)); ?>
+            <p class="text-muted">
+                <small>有效时间为从现在开始的秒数, 比如设定有效时间为一个小时: <strong>3600</strong>.<br />临时二维码最长有效时间为7天(即 604800 秒)</small>
+            </p>
+            <?php echo $this->formElementErrors($data->form->get(Form::FIELD_EXPIRED)); ?>
+        </div>
+
+
+        <div class="form-group">
+            <?php echo $this->formLabel($data->form->get(Form::FIELD_SCENE), '设置二维码参数'); ?>
+            <?php echo $this->formElement($data->form->get(Form::FIELD_SCENE)); ?>
+            <p class="text-muted">
+                <small>临时二维码: 可以设置一个数字, 最大值: 4294967296.<br />
+                    永久二维码: 可以设置一个 1 - 100000内的数字或者一个64位长度内的任意字符串</small>
+            </p>
+            <?php echo $this->formElementErrors($data->form->get(Form::FIELD_SCENE)); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formElement($data->form->get(Form::FIELD_SUBMIT)); ?>
+        </div>
+
+        <?php echo $this->form()->closeTag(); ?>
+
+    </div>
+</div>

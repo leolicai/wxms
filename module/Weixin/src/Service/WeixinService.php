@@ -11,6 +11,7 @@ namespace Weixin\Service;
 
 
 use Weixin\Entity\Menu;
+use Weixin\Entity\QRCode;
 use Weixin\Entity\Tag;
 use Weixin\Entity\Weixin;
 use Weixin\Exception\InvalidArgumentException;
@@ -64,6 +65,16 @@ class WeixinService
     }
 
 
+
+    public function qrCodeCreate($wx, QRCode $code)
+    {
+        $token = $this->getAccessToken($wx);
+        return NetworkService::QrCodeCreate($token, $code->getQrcodeTypeForMP(), $code->getQrcodeSceneForMP(), $code->getQrcodeExpired());
+    }
+
+
+
+    ////////////////////// Menu API ///////////////////////
 
     /**
      * Create a conditional menu for wx platform

@@ -66,7 +66,7 @@ class NetworkService
 
         $post->action_info = $sceneObj;
 
-        $res = self::SendPostRequest(self::WX_API_HOST . $path, json_encode($post));
+        $res = self::SendPostRequest(self::WX_API_HOST . $path, json_encode($post, JSON_UNESCAPED_UNICODE));
         if (!isset($res['ticket']) || !isset($res['expire_seconds']) || !isset($res['url'])) {
             throw new InvalidArgumentException(@$res['errmsg'], @$res['errcode']);
         }

@@ -22,8 +22,13 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class QRCode
 {
-    const TYPE_TEMP = 0;
-    const TYPE_PERSIST = 1;
+    const TYPE_TEMP = 'QR_SCENE';
+    const TYPE_TEMP_ID = 'QR_SCENE';
+    const TYPE_TEMP_STR = 'QR_STR_SCENE';
+
+    const TYPE_PERSIST = 'QR_LIMIT_STR_SCENE';
+    const TYPE_PERSIST_ID = 'QR_LIMIT_SCENE';
+    const TYPE_PERSIST_STR = 'QR_LIMIT_STR_SCENE';
 
     /**
      * @var string
@@ -39,14 +44,14 @@ class QRCode
     private $qrcodeName  = '';
 
     /**
-     * @var integer
-     * @ORM\Column(name="qrcode_type", type="integer")
+     * @var string
+     * @ORM\Column(name="qrcode_type", type="string", length=18, options={"fixed" = true})
      */
     private $qrcodeType = self::TYPE_TEMP;
 
     /**
-     * @var \DateTime
-     * @ORM\Column(name="qrcode_expired", type="datetime")
+     * @var integer
+     * @ORM\Column(name="qrcode_expired", type="integer")
      */
     private $qrcodeExpired;
 
@@ -95,6 +100,45 @@ class QRCode
         return isset($list[$this->qrcodeType]) ? $list[$this->qrcodeType] : '未知类型二维码';
     }
 
+    /**
+     * @return string
+     */
+    public function getQrcodeTypeForMP()
+    {
+        $scene = $this->getQrcodeScene();
+
+        if ($this->getQrcodeType() == self::TYPE_TEMP) {
+            return preg_match("/^[0-9]+$/", $scene) ? self::TYPE_TEMP_ID : self::TYPE_TEMP_STR;
+        }
+        if (strlen($this->getQrcodeScene()) > 5) {
+            return self::TYPE_PERSIST_STR;
+        }
+
+        return preg_match("/^[0-9]+$/", $scene) ? self::TYPE_PERSIST_ID : self::TYPE_PERSIST_STR;
+    }
+
+    /**
+     * @return int|string
+     */
+    public function getQrcodeSceneForMP()
+    {
+        $type = $this->getQrcodeTypeForMP();
+        $scene = $this->getQrcodeScene();
+
+        if ($type == self::TYPE_TEMP_ID || $type == self::TYPE_PERSIST_ID) {
+            $scene = (int)$scene;
+            if ($type == self::TYPE_PERSIST_ID) {
+                return $scene > 100000 ? 100000 : $scene;
+            }
+            return $scene;
+        }
+        if ($type == self::TYPE_TEMP_STR || $type == self::TYPE_PERSIST_STR) {
+            return (string)$this->getQrcodeScene();
+        }
+
+        return '0';
+    }
+
 
     /**
      * @return string
@@ -129,7 +173,7 @@ class QRCode
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getQrcodeType()
     {
@@ -137,7 +181,7 @@ class QRCode
     }
 
     /**
-     * @param int $qrcodeType
+     * @param string $qrcodeType
      */
     public function setQrcodeType($qrcodeType)
     {
@@ -145,7 +189,7 @@ class QRCode
     }
 
     /**
-     * @return \DateTime
+     * @return integer
      */
     public function getQrcodeExpired()
     {
@@ -153,7 +197,7 @@ class QRCode
     }
 
     /**
-     * @param \DateTime $qrcodeExpired
+     * @param integer $qrcodeExpired
      */
     public function setQrcodeExpired($qrcodeExpired)
     {

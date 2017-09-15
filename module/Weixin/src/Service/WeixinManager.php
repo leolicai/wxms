@@ -13,10 +13,12 @@ namespace Weixin\Service;
 use Application\Service\BaseManager;
 use Weixin\Entity\Client;
 use Weixin\Entity\Menu;
+use Weixin\Entity\QRCode;
 use Weixin\Entity\Tag;
 use Weixin\Entity\Weixin;
 use Weixin\Repository\ClientRepository;
 use Weixin\Repository\MenuRepository;
+use Weixin\Repository\QRCodeRepository;
 use Weixin\Repository\TagRepository;
 use Weixin\Repository\WeixinRepository;
 
@@ -90,6 +92,35 @@ class WeixinManager extends BaseManager
         return $this->getTagRepository()->find($id);
     }
 
+
+    /**
+     * @param $id
+     * @return null|object|QRCode
+     */
+    public function getQRCode($id)
+    {
+        return $this->getQRCodeRepository()->find($id);
+    }
+
+
+
+    /**
+     * @param QRCode $qrcode
+     */
+    public function saveModifiedQRCode(QRCode $qrcode)
+    {
+        $this->getEntityManager()->persist($qrcode);
+        $this->getEntityManager()->flush();
+    }
+
+    /**
+     * @param QRCode $qrcode
+     */
+    public function removeQRCode(QRCode $qrcode)
+    {
+        $this->getEntityManager()->remove($qrcode);
+        $this->getEntityManager()->flush();
+    }
 
 
     /**
@@ -203,5 +234,14 @@ class WeixinManager extends BaseManager
     private function getTagRepository()
     {
         return $this->getEntityManager()->getRepository(Tag::class);
+    }
+
+
+    /**
+     * @return QRCodeRepository | \Doctrine\ORM\EntityRepository
+     */
+    private function getQRCodeRepository()
+    {
+        return $this->getEntityManager()->getRepository(QRCode::class);
     }
 }
