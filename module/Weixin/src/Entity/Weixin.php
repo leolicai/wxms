@@ -114,12 +114,20 @@ class Weixin
      */
     private $wxTags;
 
+    /**
+     * @var QRCode[] | ArrayCollection
+     * @ORM\OneToMany(targetEntity="Weixin\Entity\QRCode", mappedBy="qrcodeWeixin", cascade={"remove"})
+     */
+    private $wxQRCodes;
+
+
 
     public function __construct()
     {
         $this->wxClients = new ArrayCollection();
         $this->wxMenus = new ArrayCollection();
         $this->wxTags = new ArrayCollection();
+        $this->wxQRCodes = new ArrayCollection();
     }
 
 
@@ -337,6 +345,22 @@ class Weixin
     public function setWxTags($wxTags)
     {
         $this->wxTags = $wxTags;
+    }
+
+    /**
+     * @return ArrayCollection|QRCode[]
+     */
+    public function getWxQRCodes()
+    {
+        return $this->wxQRCodes;
+    }
+
+    /**
+     * @param ArrayCollection|QRCode[] $wxQRCodes
+     */
+    public function setWxQRCodes($wxQRCodes)
+    {
+        $this->wxQRCodes = $wxQRCodes;
     }
 
 
