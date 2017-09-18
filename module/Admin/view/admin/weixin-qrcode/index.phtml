@@ -64,6 +64,12 @@ $this->inlineScript()->captureEnd();
                                     </li>
                                     <li class="divider"></li>
                                     <li>
+                                        <a href="<?php echo $this->url('admin/weixin-qrcode', ['action' => 'export', 'key' => $qrcode->getQrcodeID() . '_svg']); ?>" target="_blank">
+                                            <i class="fa fa-link fa-fw" aria-hidden="true"></i> 下载 SVG 格式
+                                        </a>
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li>
                                         <a href="<?php echo $this->url('admin/weixin-qrcode', ['action' => 'export', 'key' => $qrcode->getQrcodeID() . '_eps']); ?>" target="_blank">
                                             <i class="fa fa-link fa-fw" aria-hidden="true"></i> 下载 EPS 格式
                                         </a>

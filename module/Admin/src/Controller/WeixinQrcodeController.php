@@ -13,6 +13,7 @@ namespace Admin\Controller;
 use Admin\Exception\InvalidArgumentException;
 use Admin\Form\WeixinQRCodeForm;
 use Ramsey\Uuid\Uuid;
+use SimpleSoftwareIO\QrCode\BaconQrCodeGenerator;
 use Weixin\Entity\QRCode;
 use Weixin\Entity\Weixin;
 
@@ -48,8 +49,14 @@ class WeixinQrcodeController extends AdminBaseController
             throw new InvalidArgumentException('Invalid url request');
         }
 
+        $mimes = ['png' => 'image/png', 'svg' => 'image/svg+xml', 'eps' => 'application/postscript'];
+
         $qrcodeID = array_shift($keys);
         $type = array_shift($keys);
+
+        if (!array_key_exists($type, $mimes)) {
+            throw new InvalidArgumentException('Invalid QRCode type');
+        }
 
         $wxManager = $this->appWeixinManager();
         $qrcode = $wxManager->getQRCode($qrcodeID);
@@ -58,10 +65,35 @@ class WeixinQrcodeController extends AdminBaseController
             throw new InvalidArgumentException('Invalid QRCode identity');
         }
 
-        echo 'download';
+        $size = 800; //二维码尺寸
+        $margin = 2; //二维码边距
 
-        return $this->getResponse();
+        $color = '000000';
+        list($colorR, $colorG, $colorB) = array_map('hexdec', str_split($color, 2));
 
+        $bgcolor = 'FFFFFF';
+        list($bgcolorR, $bgcolorG, $bgcolorB) = array_map('hexdec', str_split($bgcolor, 2));
+
+
+        $maker = new BaconQrCodeGenerator();
+        $maker->format($type);
+        $maker->size($size);
+        $maker->margin($margin);
+        $maker->color($colorR, $colorG, $colorB); //二维码颜色
+        $maker->backgroundColor($bgcolorR, $bgcolorG, $bgcolorB); //二维码背景颜色
+        $maker->encoding('UTF-8'); //二维码内容编码
+        $maker->errorCorrection('Q'); //'L', 'M', 'Q', 'H'
+        $code = $maker->generate($qrcode->getQrcodeWxUrl());
+
+
+        $response = $this->getResponse();
+        $headers = $response->getHeaders();
+        $response->setContent($code);
+        $headers->addHeaderLine('Content-Type', $mimes[$type]);
+        $headers->addHeaderLine('Content-Disposition', 'attachment; filename="QRCode-' . date('YmdHis') . '.' . $type . '"');
+        $headers->addHeaderLine('Content-Length', strlen($code));
+
+        return $response;
     }
 
 

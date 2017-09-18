@@ -13,7 +13,9 @@
         "zendframework/zend-math": "^3.0",
         "zendframework/zend-captcha": "^2.6",
         "zendframework/zend-form": "^2.9",
-        "ramsey/uuid": "^3.5"
+        "ramsey/uuid": "^3.5",
+        "bacon/bacon-qr-code": "^1.0",
+        "simplesoftwareio/simple-qrcode": "^1.5"
     },
 
     "autoload": {
