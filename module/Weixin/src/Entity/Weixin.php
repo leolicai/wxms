@@ -120,6 +120,12 @@ class Weixin
      */
     private $wxQRCodes;
 
+    /**
+     * @var Event[] | ArrayCollection
+     * @ORM\OneToMany(targetEntity="Weixin\Entity\Event", mappedBy="eventWeixin", cascade={"remove"})
+     */
+    private $wxEvents;
+
 
 
     public function __construct()
@@ -128,6 +134,7 @@ class Weixin
         $this->wxMenus = new ArrayCollection();
         $this->wxTags = new ArrayCollection();
         $this->wxQRCodes = new ArrayCollection();
+        $this->wxEvents = new ArrayCollection();
     }
 
 
