@@ -60,6 +60,9 @@ $(function () {
         if("none" == $("#expired-row").css("display")) {
             $("#expired-row").show();
         } else {
+            if($("#expired").val().length < 1 || parseInt($("#expired").val()) < 1) {
+                $("#expired").val("30");
+            }
             $("#expired-row").hide();
         }
     });

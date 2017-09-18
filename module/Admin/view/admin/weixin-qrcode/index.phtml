@@ -7,6 +7,24 @@ if (! $data->weixin instanceof \Weixin\Entity\Weixin) {
 $this->adminPageTitleBar('公众号二维码管理', $data->weixin->getWxName());
 $this->adminSideTreeMenu()->setActiveID($data->activeID);
 
+$this->inlineScript()->captureStart();
+echo <<<JS
+
+$(function(){
+    
+    $(".delete").click(function() {
+        if(confirm('确定要删除该二维码?\\n被删除的二维码无法再恢复!')) {
+            return true;
+        }
+        $(this).blur();
+        return false;
+    });
+    
+});
+
+JS;
+$this->inlineScript()->captureEnd();
+
 ?>
 
 <div class="row">
@@ -31,7 +49,7 @@ $this->adminSideTreeMenu()->setActiveID($data->activeID);
                     <td height="50"><?php echo $qrcode->getQrcodeName(); ?></td>
                     <td><?php echo $qrcode->getQrcodeTypeAsString(); ?></td>
                     <td><?php echo $qrcode->getQrcodeScene(); ?></td>
-                    <td><?php echo \Weixin\Entity\QRCode::TYPE_PERSIST == $qrcode->getQrcodeType() ? '永久有效' : $qrcode->getQrcodeExpired()->format('Y-m-d'); ?></td>
+                    <td><?php echo \Weixin\Entity\QRCode::TYPE_PERSIST == $qrcode->getQrcodeType() ? '永久有效' : date('Y-m-d H:i:s', $qrcode->getQrcodeExpired()); ?></td>
                     <td>
                         <ul class="nav nav-pills actions-list" role="tablist">
                             <li role="presentation" class="dropdown">
@@ -40,15 +58,21 @@ $this->adminSideTreeMenu()->setActiveID($data->activeID);
                                 </a>
                                 <ul class="dropdown-menu" role="menu">
                                     <li>
-                                        <a href="#" target="_blank">
-                                            <i class="fa fa-link fa-fw" aria-hidden="true"></i> XXXXX
+                                        <a href="<?php echo $this->url('admin/weixin-qrcode', ['action' => 'export', 'key' => $qrcode->getQrcodeID() . '_png']); ?>" target="_blank">
+                                            <i class="fa fa-link fa-fw" aria-hidden="true"></i> 下载 PNG 格式
+                                        </a>
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <a href="<?php echo $this->url('admin/weixin-qrcode', ['action' => 'export', 'key' => $qrcode->getQrcodeID() . '_eps']); ?>" target="_blank">
+                                            <i class="fa fa-link fa-fw" aria-hidden="true"></i> 下载 EPS 格式
                                         </a>
                                     </li>
                                 </ul>
                             </li>
                         </ul>
                     </td>
-                    <td><a href="<?php echo $this->url('admin/weixin-qrcode', ['action' => 'delete', 'key' => $qrcode->getQrcodeID()]); ?>">删除二维码</a></td>
+                    <td><a class="delete" href="<?php echo $this->url('admin/weixin-qrcode', ['action' => 'delete', 'key' => $qrcode->getQrcodeID()]); ?>">删除二维码</a></td>
                 </tr>
 
                 <?php

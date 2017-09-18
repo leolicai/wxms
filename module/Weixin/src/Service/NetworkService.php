@@ -51,6 +51,10 @@ class NetworkService
             $post->expire_seconds = (int)$expired;
             $post->action_name = 'QR_SCENE';
             $sceneValue->scene_id = intval($scene);
+        } else if('QR_STR_SCENE' == $type) {
+            $post->expire_seconds = (int)$expired;
+            $post->action_name = 'QR_STR_SCENE';
+            $sceneValue->scene_str = (string)$scene;
         } else if('QR_LIMIT_SCENE' == $type) {
             $post->action_name = 'QR_LIMIT_SCENE';
             $sceneValue->scene_id = intval($scene);

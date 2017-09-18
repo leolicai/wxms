@@ -36,6 +36,65 @@ class WeixinQrcodeController extends AdminBaseController
     }
 
 
+    /**
+     * Export a QRCode
+     */
+    public function exportAction()
+    {
+        $key = $this->params()->fromRoute('key', '');
+        $keys = explode('_', $key);
+
+        if (count($keys) != 2) {
+            throw new InvalidArgumentException('Invalid url request');
+        }
+
+        $qrcodeID = array_shift($keys);
+        $type = array_shift($keys);
+
+        $wxManager = $this->appWeixinManager();
+        $qrcode = $wxManager->getQRCode($qrcodeID);
+
+        if (! $qrcode instanceof QRCode) {
+            throw new InvalidArgumentException('Invalid QRCode identity');
+        }
+
+        echo 'download';
+
+        return $this->getResponse();
+
+    }
+
+
+    /**
+     * Delete a QRCode
+     */
+    public function deleteAction()
+    {
+        $qrcodeID = $this->params()->fromRoute('key', '');
+        $wxManager = $this->appWeixinManager();
+
+        $qrcode = $wxManager->getQRCode($qrcodeID);
+
+        if (! $qrcode instanceof QRCode) {
+            throw new InvalidArgumentException('Invalid QRCode identity');
+        }
+
+        $wxID = $qrcode->getQrcodeWeixin()->getWxID();
+        $wxManager->removeQRCode($qrcode);
+
+        $this->go(
+            '二维码已经删除',
+            '二维码已经删除, 相关的二维码信息已失效!',
+            $this->url()->fromRoute('admin/weixin-qrcode', ['action' => 'index', 'key' => $wxID])
+        );
+
+        return $this->layout()->setTerminal(true);
+    }
+
+
+    /**
+     * Add a QRCode
+     */
     public function addAction()
     {
 
@@ -63,14 +122,20 @@ class WeixinQrcodeController extends AdminBaseController
                 $qrcode->setQrcodeName($data[WeixinQRCodeForm::FIELD_NAME]);
                 $qrcode->setQrcodeType($data[WeixinQRCodeForm::FIELD_TYPE]);
                 $qrcode->setQrcodeScene($data[WeixinQRCodeForm::FIELD_SCENE]);
+                $qrcode->setQrcodeExpired($data[WeixinQRCodeForm::FIELD_EXPIRED]);
                 $qrcode->setQrcodeCreated(new \DateTime());
                 $qrcode->setQrcodeWeixin($wx);
 
-                $res = $this->appWeixinService()->qrCodeCreate($wx, $qrcode);
-                $qrcode->setQrcodeWxUrl($res['url']);
-                $qrcode->setQrcodeExpired(time() + $res['expire_seconds']);
+                try {
+                    $res = $this->appWeixinService()->qrCodeCreate($wx, $qrcode);
+                    $qrcode->setQrcodeWxUrl($res['url']);
+                    $qrcode->setQrcodeExpired(time() + $res['expire_seconds']);
 
-                $wxManager->saveModifiedQRCode($qrcode);
+                    $wxManager->saveModifiedQRCode($qrcode);
+
+                } catch (\Weixin\Exception\InvalidArgumentException $e) {
+                    $this->appLogger()->exception($e);
+                }
 
                 $this->go(
                     '二维码已创建',
