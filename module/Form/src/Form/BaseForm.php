@@ -272,7 +272,6 @@ class BaseForm extends Form
                 $filters,
                 [
                     FilterFactory::StringTrim(),
-                    FilterFactory::StripTags(),
                 ]
             ),
         ];

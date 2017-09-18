@@ -169,8 +169,8 @@ $this->inlineScript()->captureEnd();
                                     </li>
                                     <li class="divider"></li>
                                     <li>
-                                        <a href="#">
-                                            <i class="fa fa-comments fa-fw" aria-hidden="true"></i> 关注欢迎语管理
+                                        <a href="<?php echo $this->url('admin/weixin-event', ['action' => 'index', 'key' => $entity->getWxID()]); ?>">
+                                            <i class="fa fa-bullhorn fa-fw" aria-hidden="true"></i> 事件管理
                                         </a>
                                     </li>
                                 </ul>

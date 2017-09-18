@@ -12,11 +12,13 @@ namespace Weixin\Service;
 
 use Application\Service\BaseManager;
 use Weixin\Entity\Client;
+use Weixin\Entity\Event;
 use Weixin\Entity\Menu;
 use Weixin\Entity\QRCode;
 use Weixin\Entity\Tag;
 use Weixin\Entity\Weixin;
 use Weixin\Repository\ClientRepository;
+use Weixin\Repository\EventRepository;
 use Weixin\Repository\MenuRepository;
 use Weixin\Repository\QRCodeRepository;
 use Weixin\Repository\TagRepository;
@@ -102,6 +104,45 @@ class WeixinManager extends BaseManager
         return $this->getQRCodeRepository()->find($id);
     }
 
+    /**
+     * @param $eventID
+     * @return null|object|Event
+     */
+    public function getEvent($eventID)
+    {
+        return $this->getEventRepository()->find($eventID);
+    }
+
+
+    /**
+     * @param Weixin $wx
+     * @param string $type
+     * @param string $target
+     * @return Event|null|Object
+     */
+    public function getWeixinEvent(Weixin $wx, $type, $target)
+    {
+        return $this->getEventRepository()->findOneBy(['eventWeixin' => $wx, 'eventType' => $type, 'eventTarget' => $target]);
+    }
+
+
+    /**
+     * @param Event $event
+     */
+    public function saveModifiedEvent(Event $event)
+    {
+        $this->getEntityManager()->persist($event);
+        $this->getEntityManager()->flush();
+    }
+
+    /**
+     * @param Event $event
+     */
+    public function removeEvent(Event $event)
+    {
+        $this->getEntityManager()->remove($event);
+        $this->getEntityManager()->flush();
+    }
 
 
     /**
@@ -140,7 +181,6 @@ class WeixinManager extends BaseManager
         $this->getEntityManager()->remove($tag);
         $this->getEntityManager()->flush();
     }
-
 
 
     /**
@@ -243,5 +283,14 @@ class WeixinManager extends BaseManager
     private function getQRCodeRepository()
     {
         return $this->getEntityManager()->getRepository(QRCode::class);
+    }
+
+
+    /**
+     * @return EventRepository | \Doctrine\ORM\EntityRepository
+     */
+    private function getEventRepository()
+    {
+        return $this->getEntityManager()->getRepository(Event::class);
     }
 }

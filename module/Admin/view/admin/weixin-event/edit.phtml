@@ -1,0 +1,67 @@
+<?php
+use Admin\Form\WeixinEventForm as Form;
+
+if (! $data->event instanceof \Weixin\Entity\Event) {
+    throw new \Admin\Exception\RuntimeException('Invalid event object');
+}
+
+$this->adminPageTitleBar('公众号事件修改', $data->event->getEventWeixin()->getWxName());
+$this->adminSideTreeMenu()->setActiveID($data->activeID);
+
+
+$input = $data->form->get(Form::FIELD_HANDLE);
+$input->setAttributes([
+    'class' => 'form-control',
+    'value' => $data->event->getEventHandle(),
+]);
+
+$input = $data->form->get(Form::FIELD_RESULT);
+$input->setAttributes([
+    'class' => 'form-control',
+    'value' => $data->event->getEventResult(),
+]);
+
+$data->form->get(Form::FIELD_SUBMIT)->setAttributes(['class'=>'btn btn-primary']);
+
+$data->form->prepare();
+
+?>
+
+
+<div class="row">
+    <div class="col-lg-6">
+
+        <?php echo $this->form()->openTag($data->form); ?>
+
+        <div class="form-group">
+            <?php echo $this->formElement($data->form->get(Form::FIELD_CSRF)); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($data->form->get(Form::FIELD_HANDLE), '选择事件回应方式'); ?>
+            <?php echo $this->formElement($data->form->get(Form::FIELD_HANDLE)); ?>
+            <p class="text-muted">
+                <small>使用接口回应消息务必在5秒内返回结果. 否则失败!</small>
+            </p>
+            <?php echo $this->formElementErrors($data->form->get(Form::FIELD_HANDLE)); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($data->form->get(Form::FIELD_RESULT), '事件回应设置'); ?>
+            <?php echo $this->formElement($data->form->get(Form::FIELD_RESULT)); ?>
+            <p class="text-muted">
+                <small>填入转发的 API 地址或者回应的消息模板. 模板内容请参考微信公众平台文档</small>
+            </p>
+            <?php echo $this->formElementErrors($data->form->get(Form::FIELD_RESULT)); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formElement($data->form->get(Form::FIELD_SUBMIT)); ?>
+        </div>
+
+        <?php echo $this->form()->closeTag(); ?>
+
+    </div>
+</div>
+
+

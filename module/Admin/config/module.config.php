@@ -27,6 +27,7 @@ return [
             Controller\WeixinMenuController::class => InvokableFactory::class,
             Controller\WeixinTagController::class => InvokableFactory::class,
             Controller\WeixinQrcodeController::class => InvokableFactory::class,
+            Controller\WeixinEventController::class => InvokableFactory::class,
         ],
     ],
 
@@ -243,7 +244,23 @@ return [
                             ],
                         ],
                     ],
-                    // TBM
+
+                    'weixin-event' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => 'weixin-event[/:action[/:key]][:suffix]',
+                            'constraints' => [
+                                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                                'key' => '[a-zA-Z0-9_\-]+',
+                                'suffix' => '(/|.html)',
+                            ],
+                            'defaults' => [
+                                'controller' => Controller\WeixinEventController::class,
+                                'action' => 'index',
+                            ],
+                        ],
+                    ],
+
                 ],
             ],
         ],

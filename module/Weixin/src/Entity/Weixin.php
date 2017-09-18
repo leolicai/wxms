@@ -370,6 +370,22 @@ class Weixin
         $this->wxQRCodes = $wxQRCodes;
     }
 
+    /**
+     * @return ArrayCollection|Event[]
+     */
+    public function getWxEvents()
+    {
+        return $this->wxEvents;
+    }
+
+    /**
+     * @param ArrayCollection|Event[] $wxEvents
+     */
+    public function setWxEvents($wxEvents)
+    {
+        $this->wxEvents = $wxEvents;
+    }
+
 
 
 }
