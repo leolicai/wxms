@@ -36,6 +36,35 @@ $this->formLocalMessage($input, [
     \Zend\Validator\NotEmpty::IS_EMPTY => '请为此公众号设置一个名称.',
 ]);
 
+$input = $data->form->get(WeixinForm::FIELD_TOKEN);
+$input->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => '公众号接入TOKEN'
+]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '请填写此公众号开发者接入 Token.',
+    '__undefined__' => 'Token 长度在3-32个字符内有效!',
+]);
+
+$input = $data->form->get(WeixinForm::FIELD_ENCODING_AES_KEY);
+$input->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => '公众号接入 EncodingAESKey'
+]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '请填写此公众号开发者接入 EncodingAESKey.',
+    '__undefined__' => 'EncodingAESKey 长度在1-43个字符内有效!',
+]);
+
+$input = $data->form->get(WeixinForm::FIELD_TRANSFER_MODE);
+$input->setAttributes([
+    'class' => 'form-control',
+]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '请设置好消息加密模式.',
+]);
+
+
 $data->form->get(WeixinForm::FIELD_SUBMIT)->setAttributes(['class'=>"btn btn-primary"]);
 
 $data->form->prepare();
@@ -119,6 +148,30 @@ $this->inlineScript()->captureEnd();
             <?php echo $this->formLabel($data->form->get(WeixinForm::FIELD_NAME), '微信公众号名称'); ?>
             <?php echo $this->formElement($data->form->get(WeixinForm::FIELD_NAME)); ?>
             <?php echo $this->formElementErrors($data->form->get(WeixinForm::FIELD_NAME)); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($data->form->get(WeixinForm::FIELD_TOKEN), '微信公众号Token'); ?>
+            <?php echo $this->formElement($data->form->get(WeixinForm::FIELD_TOKEN)); ?>
+            <p class="text-muted">
+                <small>必须为英文或数字，长度为3-32字符。</small>
+            </p>
+            <?php echo $this->formElementErrors($data->form->get(WeixinForm::FIELD_TOKEN)); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($data->form->get(WeixinForm::FIELD_ENCODING_AES_KEY), '微信公众号消息加密KEY'); ?>
+            <?php echo $this->formElement($data->form->get(WeixinForm::FIELD_ENCODING_AES_KEY)); ?>
+            <p class="text-muted">
+                <small>消息加密密钥由43位字符组成，可随机修改，字符范围为A-Z，a-z，0-9。</small>
+            </p>
+            <?php echo $this->formElementErrors($data->form->get(WeixinForm::FIELD_ENCODING_AES_KEY)); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($data->form->get(WeixinForm::FIELD_TRANSFER_MODE), '微信公众号消息加密模式'); ?>
+            <?php echo $this->formElement($data->form->get(WeixinForm::FIELD_TRANSFER_MODE)); ?>
+            <?php echo $this->formElementErrors($data->form->get(WeixinForm::FIELD_TRANSFER_MODE)); ?>
         </div>
 
         <div class="form-group">

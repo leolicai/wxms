@@ -137,6 +137,9 @@ class WeixinController extends AdminBaseController
                     $weixin->setWxAppID($appId);
                     $weixin->setWxName($appName);
                     $weixin->setWxAppSecret($appSecret);
+                    $weixin->setWxToken($data[WeixinForm::FIELD_TOKEN]);
+                    $weixin->setWxEncodingAESKey($data[WeixinForm::FIELD_ENCODING_AES_KEY]);
+                    $weixin->setWxTransferMode($data[WeixinForm::FIELD_TRANSFER_MODE]);
                     $weixin->setWxAccessToken($accessToken);
                     $weixin->setWxAccessTokenExpired($expiredIn);
                     $weixin->setWxCreated(new \DateTime());
@@ -195,6 +198,9 @@ class WeixinController extends AdminBaseController
 
                 if ($appSecret == $weixin->getWxAppSecret()) {
                     $weixin->setWxName($appName);
+                    $weixin->setWxToken($data[WeixinForm::FIELD_TOKEN]);
+                    $weixin->setWxEncodingAESKey($data[WeixinForm::FIELD_ENCODING_AES_KEY]);
+                    $weixin->setWxTransferMode($data[WeixinForm::FIELD_TRANSFER_MODE]);
 
                     $weixinManager->saveModifiedWeixin($weixin);
 
@@ -215,6 +221,9 @@ class WeixinController extends AdminBaseController
 
                     $weixin->setWxName($appName);
                     $weixin->setWxAppSecret($appSecret);
+                    $weixin->setWxToken($data[WeixinForm::FIELD_TOKEN]);
+                    $weixin->setWxEncodingAESKey($data[WeixinForm::FIELD_ENCODING_AES_KEY]);
+                    $weixin->setWxTransferMode($data[WeixinForm::FIELD_TRANSFER_MODE]);
                     $weixin->setWxAccessToken($accessToken);
                     $weixin->setWxAccessTokenExpired($expiredIn);
 

@@ -28,6 +28,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Weixin
 {
+    const TRANSFER_PUBLIC = 1;
+    const TRANSFER_COMPATIBLE = 2;
+    const TRANSFER_ENCODING = 3;
+
     /**
      * @var integer
      * @ORM\Id
@@ -53,6 +57,24 @@ class Weixin
      * @ORM\Column(name="wx_appsecret", type="string", length=255, options={"fixed" = true})
      */
     private $wxAppSecret = '';
+
+    /**
+     * @var string
+     * @ORM\Column(name="wx_token", type="string", length=32, options={"fixed" = true})
+     */
+    private $wxToken = '';
+
+    /**
+     * @var string
+     * @ORM\Column(name="wx_encoding_aes_key", type="string", length=43, options={"fixed" = true})
+     */
+    private $wxEncodingAESKey = '';
+
+    /**
+     * @var integer
+     * @ORM\Column(name="wx_transfer_mode", type="integer")
+     */
+    private $wxTransferMode = self::TRANSFER_PUBLIC;
 
     /**
      * @var string
@@ -137,6 +159,27 @@ class Weixin
         $this->wxEvents = new ArrayCollection();
     }
 
+    /**
+     * @return array
+     */
+    public static function TransferModeStringsList()
+    {
+        return [
+            self::TRANSFER_PUBLIC => '明文模式',
+            self::TRANSFER_COMPATIBLE => '兼容模式',
+            self::TRANSFER_ENCODING => '加密模式',
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getWxTransferModeAsString()
+    {
+        $list = self::TransferModeStringsList();
+        return isset($list[$this->wxTransferMode]) ? $list[$this->wxTransferMode] : '未知模式';
+    }
+
 
     /**
      * @return int
@@ -192,6 +235,54 @@ class Weixin
     public function setWxAppSecret($wxAppSecret)
     {
         $this->wxAppSecret = $wxAppSecret;
+    }
+
+    /**
+     * @return string
+     */
+    public function getWxToken()
+    {
+        return $this->wxToken;
+    }
+
+    /**
+     * @param string $wxToken
+     */
+    public function setWxToken($wxToken)
+    {
+        $this->wxToken = $wxToken;
+    }
+
+    /**
+     * @return string
+     */
+    public function getWxEncodingAESKey()
+    {
+        return $this->wxEncodingAESKey;
+    }
+
+    /**
+     * @param string $wxEncodingAESKey
+     */
+    public function setWxEncodingAESKey($wxEncodingAESKey)
+    {
+        $this->wxEncodingAESKey = $wxEncodingAESKey;
+    }
+
+    /**
+     * @return int
+     */
+    public function getWxTransferMode()
+    {
+        return $this->wxTransferMode;
+    }
+
+    /**
+     * @param int $wxTransferMode
+     */
+    public function setWxTransferMode($wxTransferMode)
+    {
+        $this->wxTransferMode = $wxTransferMode;
     }
 
     /**

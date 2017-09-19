@@ -23,6 +23,9 @@ class WeixinForm extends BaseForm
     const FIELD_APPID = 'appid';
     const FIELD_APPSECRET = 'appsecret';
     const FIELD_NAME = 'name';
+    const FIELD_TOKEN = 'token';
+    const FIELD_ENCODING_AES_KEY = 'aes_key';
+    const FIELD_TRANSFER_MODE = 'transfer_mode';
 
     /**
      * @var WeixinManager
@@ -88,6 +91,38 @@ class WeixinForm extends BaseForm
         $this->addTextElement(self::FIELD_NAME, true, $validators);
     }
 
+    /**
+     * Form field token
+     */
+    private function formFieldToken()
+    {
+        $validators = [
+            Factory::StringLength(3, 32),
+        ];
+
+        $this->addTextElement(self::FIELD_TOKEN, true, $validators);
+    }
+
+    /**
+     * Form field encoding aes key
+     */
+    private function formFieldEncodingAESKey()
+    {
+        $validators = [
+            Factory::StringLength(1, 43),
+        ];
+
+        $this->addTextElement(self::FIELD_ENCODING_AES_KEY, true, $validators);
+    }
+
+    /**
+     * Form field transfer mode
+     */
+    private function formFieldTransferMode()
+    {
+        $this->addSelectElement(self::FIELD_TRANSFER_MODE, Weixin::TransferModeStringsList());
+    }
+
 
     public function addElements()
     {
@@ -96,6 +131,9 @@ class WeixinForm extends BaseForm
         }
         $this->formFieldAppSecret();
         $this->formFieldName();
+        $this->formFieldToken();
+        $this->formFieldEncodingAESKey();
+        $this->formFieldTransferMode();
     }
 
 }
