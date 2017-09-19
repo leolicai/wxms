@@ -7,6 +7,18 @@ if (! $data->weixin instanceof \Weixin\Entity\Weixin) {
 $this->adminPageTitleBar('公众号事件管理', $data->weixin->getWxName());
 $this->adminSideTreeMenu()->setActiveID($data->activeID);
 
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+
+$(function () {
+  $('[data-toggle="popover"]').popover();
+});
+
+JS;
+$this->inlineScript()->captureEnd();
+
+
 ?>
 
 <div class="row">
@@ -25,6 +37,49 @@ $this->adminSideTreeMenu()->setActiveID($data->activeID);
                 <th>回应设置</th>
                 <th>操作</th>
             </tr>
+            <?php
+            $events = $data->weixin->getWxEvents(); $i=0;
+            foreach ($events as $event) {
+                ?>
+                <tr>
+                    <td height="50"><?php echo $event->getEventTypeAsString(); ?></td>
+                    <td><?php echo $event->getEventTarget(); ?></td>
+                    <td>
+                        <a role="button"
+                           tabindex="<?php echo $i++; ?>"
+                                class="btn btn-xs btn-success"
+                                data-toggle="popover"
+                                data-trigger="focus"
+                                title="回应设置"
+                                data-content="<?php echo $event->getEventResult(); ?>"
+                        ><?php echo $event->getEventHandleAsString(); ?></a>
+                    </td>
+                    <td>
+                        <ul class="nav nav-pills actions-list" role="tablist">
+                            <li role="presentation" class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                    操作 <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li>
+                                        <a href="<?php echo $this->url('admin/weixin-event', ['action'=>'edit', 'key' => $event->getEventID()]); ?>">
+                                            <i class="fa fa-edit fa-fw" aria-hidden="true"></i> 编辑事件
+                                        </a>
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <a class="delete" href="<?php echo $this->url('admin/weixin-event', ['action'=>'delete', 'key' => $event->getEventID()]); ?>">
+                                            <i class="fa fa-trash fa-fw" aria-hidden="true"></i> 删除事件
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            <?php
+            }
+            ?>
         </table>
 
     </div>

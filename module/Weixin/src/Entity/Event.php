@@ -95,7 +95,7 @@ class Event
     public function getEventTypeAsString()
     {
         $list = self::EventTypeStringList();
-        return isset($list[$this->eventType]) ?: '未知事件';
+        return isset($list[$this->eventType]) ? $list[$this->eventType] : '未知事件';
     }
 
     /**
@@ -115,7 +115,7 @@ class Event
     public function getEventHandleAsString()
     {
         $list = self::EventHandleStringList();
-        return isset($list[$this->eventHandle]) ?: '未知内容';
+        return isset($list[$this->eventHandle]) ? $list[$this->eventHandle] : '未知内容';
     }
 
     /**
