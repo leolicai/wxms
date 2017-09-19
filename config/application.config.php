@@ -33,6 +33,6 @@ return [
 
         'module_map_cache_key' => 'application.module.cache',
 
-        'cache_dir' => 'data/cache/',
+        'cache_dir' => __DIR__ . '/./../data/cache/',
     ],
 ];
