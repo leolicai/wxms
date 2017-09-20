@@ -133,6 +133,10 @@ XML;
             }
         }
 
+        if (empty($eventKey)) {
+            return '';
+        }
+
         $event = $wxManager->getWeixinEvent($wx, $eventName, $eventKey);
         if (! $event instanceof Event) {
             return '';
