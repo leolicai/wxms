@@ -23,7 +23,8 @@ class MessageController extends WeixinBaseController
      */
     public static function ParseXml($xml_string)
     {
-        $xml = simplexml_load_string($xml_string);
+        libxml_disable_entity_loader(true);
+        $xml = simplexml_load_string($xml_string,'SimpleXMLElement', LIBXML_NOCDATA);
         if (false === $xml) {
             return false;
         }
@@ -116,15 +117,20 @@ XML;
         $wxManager = $this->appWeixinManager();
 
         if ('subscribe' == $eventName) {
-            $eventKey = @$data['EventKey'];
-            $eventKey = str_replace('qrscene_', '', (string)$eventKey);
-            if (empty($eventKey)) {
+            if (!isset($data['EventKey']) || empty($data['EventKey'])) {
                 $eventKey = 'Default';
+            } else {
+                $eventKey = (string)$data['EventKey'];
+                $eventKey = str_replace('qrscene_', '', (string)$eventKey);
             }
         }
 
         if ('scan' == $eventName || 'view' == $eventName) {
-            $eventKey = @$data['EventKey'];
+            if (!isset($data['EventKey']) || empty($data['EventKey'])) {
+                $eventKey = '';
+            } else {
+                $eventKey = (string)$data['EventKey'];
+            }
         }
 
         $event = $wxManager->getWeixinEvent($wx, $eventName, $eventKey);
