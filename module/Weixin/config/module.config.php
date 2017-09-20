@@ -137,7 +137,7 @@ return [
                     'message' => [
                         'type' => Segment::class,
                         'options' => [
-                            'route' => 'dashboard[/:action[/:key]][:suffix]',
+                            'route' => 'message[/:action[/:key]][:suffix]',
                             'constraints' => [
                                 'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
                                 'key' => '[a-zA-Z0-9_\-]+',
