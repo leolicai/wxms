@@ -150,7 +150,23 @@ return [
                         ],
                     ],
 
-                    // TBM
+                    'api' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => 'api[/:action[/:wx[/:client]]][:suffix]',
+                            'constraints' => [
+                                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                                'wx' => '[0-9]+',
+                                'client' => '[a-zA-Z0-9_\-]+',
+                                'suffix' => '(/|.json|.html)',
+                            ],
+                            'defaults' => [
+                                'controller' => Controller\ApiController::class,
+                                'action' => 'index',
+                            ],
+                        ],
+                    ],
+
                 ],
             ],
 

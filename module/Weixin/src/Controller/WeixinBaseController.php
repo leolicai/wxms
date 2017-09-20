@@ -12,11 +12,20 @@ namespace Weixin\Controller;
 
 use Application\Controller\AppBaseController;
 use Weixin\Service\WeixinManager;
+use Weixin\Service\WeixinService;
 
 
 class WeixinBaseController extends AppBaseController
 {
 
+
+    /**
+     * @return WeixinService
+     */
+    public function appWeixinService()
+    {
+        return $this->appServiceManager(WeixinService::class);
+    }
 
     /**
      * @return WeixinManager

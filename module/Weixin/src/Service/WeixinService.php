@@ -40,11 +40,11 @@ class WeixinService
         if (is_scalar($wxID)) {
             $weixinEntity = $this->weixinManager->getWeixin($wxID);
             if (! $weixinEntity instanceof Weixin) {
-                throw new InvalidArgumentException('Invalid weixin ID');
+                throw new InvalidArgumentException('Invalid wx ID');
             }
         } else {
             if (! $wxID instanceof Weixin) {
-                throw new InvalidArgumentException('Invalid weixin object');
+                throw new InvalidArgumentException('Invalid wx object');
             }
             $weixinEntity = $wxID;
         }
@@ -64,8 +64,100 @@ class WeixinService
         return $accessToken;
     }
 
+    /**
+     * @param int|Weixin $wx
+     * @return string
+     */
+    public function getJsApiTicket($wx)
+    {
+        if (is_scalar($wx)) {
+            $weixinEntity = $this->weixinManager->getWeixin($wx);
+            if (! $weixinEntity instanceof Weixin) {
+                throw new InvalidArgumentException('Invalid wx ID');
+            }
+        } else {
+            if (! $wx instanceof Weixin) {
+                throw new InvalidArgumentException('Invalid wx object');
+            }
+            $weixinEntity = $wx;
+        }
+
+        $ticket = $weixinEntity->getWxJsapiTicket();
+        if (empty($ticket) || $weixinEntity->getWxJsapiTicketExpired() < time()) { // Auto refresh token
+
+            $res = NetworkService::GetJsapiTicket($this->getAccessToken($weixinEntity));
+
+            $expiredIn = $res['expires_in'] + time() - 60;
+            $weixinEntity->setWxJsapiTicket($res['ticket']);
+            $weixinEntity->setWxJsapiTicketExpired($expiredIn);
+            $this->weixinManager->saveModifiedWeixin($weixinEntity);
+
+            return $res['ticket'];
+        }
+
+        return $ticket;
+    }
+
+    /**
+     * @param int|Weixin $wx
+     * @return string
+     */
+    public function getApiTicket($wx)
+    {
+        if (is_scalar($wx)) {
+            $weixinEntity = $this->weixinManager->getWeixin($wx);
+            if (! $weixinEntity instanceof Weixin) {
+                throw new InvalidArgumentException('Invalid wx ID');
+            }
+        } else {
+            if (! $wx instanceof Weixin) {
+                throw new InvalidArgumentException('Invalid wx object');
+            }
+            $weixinEntity = $wx;
+        }
+
+        $ticket = $weixinEntity->getWxCardTicket();
+        if (empty($ticket) || $weixinEntity->getWxCardTicketExpired() < time()) { // Auto refresh token
+
+            $res = NetworkService::GetCardTicket($this->getAccessToken($weixinEntity));
+
+            $expiredIn = $res['expires_in'] + time() - 60;
+            $weixinEntity->setWxCardTicket($res['ticket']);
+            $weixinEntity->setWxCardTicketExpired($expiredIn);
+            $this->weixinManager->saveModifiedWeixin($weixinEntity);
+
+            return $res['ticket'];
+        }
+
+        return $ticket;
+    }
 
 
+    ////////////////////// User API ///////////////////////
+
+    /**
+     * Get user information
+     *
+     * @param $wx
+     * @param $openid
+     * @return array
+     */
+    public function userinfo($wx, $openid)
+    {
+        $token = $this->getAccessToken($wx);
+        return NetworkService::UserInfo($token, $openid);
+    }
+
+
+    ////////////////////// QRCode API ///////////////////////
+
+    /**
+     * Create a QRCode
+     *
+     * @param $wx
+     * @param QRCode $code
+     * @return array
+     */
     public function qrCodeCreate($wx, QRCode $code)
     {
         $token = $this->getAccessToken($wx);
