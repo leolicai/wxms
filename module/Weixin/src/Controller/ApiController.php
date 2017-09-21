@@ -518,9 +518,9 @@ class ApiController extends WeixinBaseController
         return [
             'access-token' => '读取微信公众号 AccessToken 信息接口',
             'js-api-ticket' => '读取微信公众号JS-SDK接口票据接口',
-            'api-ticket' => '读取微信公众号卡券票据接口',
+            //'api-ticket' => '读取微信公众号卡券票据接口',
             'js-sign' => '微信公众号 JS-SDK 使用权限签名接口',
-            'card-sign' => '微信公众号卡券签名接口',
+            //'card-sign' => '微信公众号卡券签名接口',
             'oauth' => '网页授权接口',
         ];
     }

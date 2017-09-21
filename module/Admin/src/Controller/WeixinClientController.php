@@ -144,4 +144,85 @@ class WeixinClientController extends AdminBaseController
 
     }
 
+    /**
+     * Download api document
+     */
+    public function documentAction()
+    {
+        $clientID = $this->params()->fromRoute('key', '');
+        $wxManager = $this->appWeixinManager();
+        $client = $wxManager->getClient($clientID);
+
+        if (! $client instanceof Client) {
+            throw new InvalidArgumentException('Invalid client identity');
+        }
+
+        $wxID = $client->getClientWeixin()->getWxID();
+        $host = $this->appServer()->domain();
+
+        $allowedApis = json_decode($client->getClientApi());
+        $openedApis = ApiController::OpenedApi();
+
+        $apiItems = [];
+        foreach ($openedApis as $apiAction => $apiName) {
+            if (in_array($apiAction, $allowedApis)) {
+                $suffix = '.json';
+                if ('oauth' == $apiAction) {
+                    $suffix = '.html';
+                }
+                $path = $this->url()->fromRoute('weixin/api', ['action' => $apiAction, 'wx' => $wxID, 'client' => $clientID, 'suffix' => $suffix]);
+
+                if ('oauth' == $apiAction) {
+                    $path .= "?type=(base 或 userinfo)&url=urlencode('授权回调URL')";
+                }
+                if('js-sign' == $apiAction) {
+                    $path .= "?url=urlencode('需签名的URL')";
+                }
+                if('userinfo' == $apiAction) {
+                    $path .= "?openid=OPENID";
+                }
+
+                $apiItems[] = [
+                    'title' => $apiName,
+                    'url' => $host . $path,
+                ];
+            }
+        }
+
+
+        $excel = new \PHPExcel();
+        $excel->getProperties()->setCreator($_SERVER['HTTP_HOST']);
+        $excel->setActiveSheetIndex(0)
+            ->setCellValue('A1', '接口名')
+            ->setCellValue('B1', '接口地址');
+        $start = 2;
+        foreach($apiItems as $api) {
+            $titleCell = 'A' . $start;
+            $valueCell = 'B' . $start;
+            $start++;
+            $excel->setActiveSheetIndex(0)
+                ->setCellValue($titleCell, $api['title'])
+                ->setCellValue($valueCell, $api['url']);
+        }
+
+        $excel->getActiveSheet()->setTitle('微信公众号接口列表');
+        $excel->setActiveSheetIndex(0);
+
+        $excelWriter = \PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+
+        $filename = 'Client_' . $clientID . '_Api_'  . date('Ymd') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        $excelWriter->save('php://output');
+
+        return $response = $this->getResponse();
+
+        //$headers = $response->getHeaders();
+        //$headers->addHeaderLine('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        //$headers->addHeaderLine('Content-Disposition', 'attachment; filename="' . $filename . '"');
+        //$excelWriter->save('php://output');
+        //return $response;
+    }
+
 }
