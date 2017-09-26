@@ -15,7 +15,6 @@ class IndexController extends AppBaseController
 
     public function indexAction()
     {
-
         $this->addResultData('name', 'Baby!');
     }
 

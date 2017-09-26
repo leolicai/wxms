@@ -64,7 +64,7 @@ class ApiController extends WeixinBaseController
         $url = urldecode($this->params()->fromQuery('url', ''));
         $domain = parse_url($url, PHP_URL_HOST);
 
-        return $client->getClientDomain() == $domain;
+        return preg_match("/" . $client->getClientDomain() . "/", $domain);
     }
 
     private function checkDate(Client $client)
