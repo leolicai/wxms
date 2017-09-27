@@ -75,7 +75,7 @@ class Module
         // For some ajax request.
         if (self::ACCEPT_TYPE_JSON == $_forceType) {
             $content = json_encode($resultData, JSON_UNESCAPED_UNICODE);
-            $this->setQuickResponse($event, $content);
+            $this->setQuickResponse($event, $content, self::ACCEPT_TYPE_JSON);
             $logger->debug(
                 __METHOD__ . PHP_EOL .
                 'Force response to application/json by action.' . PHP_EOL .
@@ -87,7 +87,7 @@ class Module
         // For some thirty api request
         if (self::ACCEPT_TYPE_PLAIN == $_forceType) {
             $content = @(string)$resultData['content'];
-            $this->setQuickResponse($event, $content);
+            $this->setQuickResponse($event, $content, self::ACCEPT_TYPE_PLAIN);
             $logger->debug(
                 __METHOD__ . PHP_EOL .
                 'Force response to text/plain by action.' . PHP_EOL .
@@ -127,7 +127,7 @@ class Module
             //if ($accept->hasMediaType(self::ACCEPT_TYPE_JSON)) {
             if (self::ACCEPT_TYPE_JSON == $this->getAcceptFirstType($acceptFieldValue)) {
                 $content = json_encode($resultData, JSON_UNESCAPED_UNICODE);
-                $this->setQuickResponse($event, $content);
+                $this->setQuickResponse($event, $content, self::ACCEPT_TYPE_JSON);
                 $logger->debug(
                     __METHOD__ . PHP_EOL .
                     'The request accept type is JSON, use ' . self::ACCEPT_TYPE_JSON . ' response.' . PHP_EOL .
@@ -205,7 +205,7 @@ class Module
         // For some ajax request.
         if (self::ACCEPT_TYPE_JSON == $_forceType) {
             $content = json_encode($err, JSON_UNESCAPED_UNICODE);
-            $this->setQuickResponse($event, $content);
+            $this->setQuickResponse($event, $content, self::ACCEPT_TYPE_JSON);
             $logger->err(
                 __METHOD__ . PHP_EOL .
                 'Force response to application/json by action.' . PHP_EOL .
@@ -217,7 +217,7 @@ class Module
         // For some thirty api request
         if (self::ACCEPT_TYPE_PLAIN == $_forceType) {
             $content = '[' . $err->code . ']' . $err->message;
-            $this->setQuickResponse($event, $content);
+            $this->setQuickResponse($event, $content, self::ACCEPT_TYPE_PLAIN);
             $logger->err(
                 __METHOD__ . PHP_EOL .
                 'Force response to text/plain by action.' . PHP_EOL .
@@ -256,7 +256,7 @@ class Module
 
             if (self::ACCEPT_TYPE_JSON == $this->getAcceptFirstType($acceptFieldValue)) {
                 $content = json_encode($err, JSON_UNESCAPED_UNICODE);
-                $this->setQuickResponse($event, $content);
+                $this->setQuickResponse($event, $content, self::ACCEPT_TYPE_JSON);
                 $logger->err(
                     __METHOD__ . PHP_EOL .
                     'The request accept type is JSON, use ' . self::ACCEPT_TYPE_JSON . ' response.' . PHP_EOL .
@@ -286,22 +286,30 @@ class Module
     /**
      * @param MvcEvent $event
      * @param string $content
+     * @param string $mediaType
      */
-    private function setQuickResponse(MvcEvent $event, $content = '')
+    private function setQuickResponse(MvcEvent $event, $content = '', $mediaType = self::ACCEPT_TYPE_JSON)
     {
-        $headerContentType = new \Zend\Http\Header\ContentType();
-        $headerContentType->setMediaType(self::ACCEPT_TYPE_JSON);
-        $headerContentType->setCharset('UTF-8');
-
-        $responseHeaders = new \Zend\Http\Headers();
-        $responseHeaders->addHeader($headerContentType);
-
         $response = $event->getResponse();
         if (! $response instanceof \Zend\Http\Response) {
             $response = new \Zend\Http\Response();
         }
 
-        $response->setHeaders($responseHeaders);
+        $headers = $response->getHeaders();
+
+        $headerContentType = new \Zend\Http\Header\ContentType();
+        $headerContentType->setMediaType($mediaType);
+        $headerContentType->setCharset('UTF-8');
+
+        $headers->addHeader($headerContentType);
+
+        $logger = $event->getApplication()->getServiceManager()->get("AppLogger");
+        foreach($headers as $header) {
+            $logger->info(__METHOD__ . PHP_EOL . $header->toString());
+        }
+
+
+        $response->setHeaders($headers);
         $response->setContent($content);
 
         $event->setResult($response);

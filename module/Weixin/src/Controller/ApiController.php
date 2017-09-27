@@ -33,6 +33,11 @@ class ApiController extends WeixinBaseController
         return $str;
     }
 
+    private function allowAccessControl()
+    {
+        $this->getResponse()->getHeaders()->addHeaderLine("Access-Control-Allow-Origin", "*");
+    }
+
 
     private function getWx()
     {
@@ -264,6 +269,8 @@ class ApiController extends WeixinBaseController
             $this->setResultCodeMessage(-401, 'Access time invalid.');
             return;
         }
+
+        $this->allowAccessControl();
 
         $url = urldecode($this->params()->fromQuery('url', ''));
         $ticket = $this->appWeixinService()->getJsApiTicket($wx);

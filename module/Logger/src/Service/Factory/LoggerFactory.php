@@ -35,6 +35,9 @@ class LoggerFactory implements FactoryInterface
                 if (!is_dir($path)) {
                     mkdir($path, 0777, true);
                 }
+
+                // Fix config cached bug
+                $options['stream'] = $path . DIRECTORY_SEPARATOR . 'log-' . date('Ymd') . '.txt';
             }
 
             $writer = new $writerConfig['name']($options);
