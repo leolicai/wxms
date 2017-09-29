@@ -73,6 +73,12 @@ $this->adminSideTreeMenu()->setActiveID($data->activeID);
                                 </a>
                                 <ul class="dropdown-menu" role="menu">
                                     <li>
+                                        <a href="<?php echo $this->url('admin/weixin-client', ['action' => 'edit', 'key' => $client->getClientID()]); ?>">
+                                            <i class="fa fa-edit fa-fw" aria-hidden="true"></i> 修改配置
+                                        </a>
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li>
                                         <a href="<?php echo $this->url('admin/weixin-client', ['action' => 'document', 'key' => $client->getClientID()]); ?>" target="_blank">
                                             <i class="fa fa-file-excel-o fa-fw" aria-hidden="true"></i> 下载 API 文档
                                         </a>

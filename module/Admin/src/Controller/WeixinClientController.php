@@ -71,6 +71,79 @@ class WeixinClientController extends AdminBaseController
 
 
     /**
+     * Edit client configuration
+     */
+    public function editAction()
+    {
+        $clientID = $this->params()->fromRoute('key', '');
+        $wxManager = $this->appWeixinManager();
+
+        $client = $wxManager->getClient($clientID);
+        if (! $client instanceof Client) {
+            throw new InvalidArgumentException('Invalid wx client identity');
+        }
+
+        $apiList = ApiController::OpenedApi();
+
+        $form = new WeixinClientForm();
+
+        if($this->getRequest()->isPost()) {
+            $postData = $this->params()->fromPost();
+            if ('*' == $postData[WeixinClientForm::FIELD_DOMAIN]) {
+                $postData[WeixinClientForm::FIELD_DOMAIN] = Client::DOMAIN_ALL;
+            }
+            if ('*' == $postData[WeixinClientForm::FIELD_IP]) {
+                $postData[WeixinClientForm::FIELD_IP] = Client::IP_ALL;
+            }
+
+            $form->setData($postData);
+            if ($form->isValid()) {
+                $data = $form->getData();
+
+                $selectedApis = $data[WeixinClientForm::FIELD_API];
+                if (empty($selectedApis)) {
+                    $selectedApis = '';
+                } else {
+                    $selectedApis = json_encode($selectedApis);
+                }
+
+                $client->setClientName($data[WeixinClientForm::FIELD_NAME]);
+                $client->setClientDomain($data[WeixinClientForm::FIELD_DOMAIN]);
+                $client->setClientIp($data[WeixinClientForm::FIELD_IP]);
+                $client->setClientStart(new \DateTime($data[WeixinClientForm::FIELD_START]));
+                $client->setClientExpired(new \DateTime($data[WeixinClientForm::FIELD_EXPIRED]));
+                $client->setClientApi($selectedApis);
+
+                $wxManager->saveModifiedClient($client);
+
+                $this->go(
+                    '客户端已更新',
+                    '客户端: ' . $client->getClientName() . ' 配置已经更新成功!',
+                    $this->url()->fromRoute('admin/weixin-client', ['action' => 'index', 'key' => $client->getClientWeixin()->getWxID()])
+                );
+                return $this->layout()->setTerminal(true);
+            }
+
+
+            if (Client::DOMAIN_ALL == $postData[WeixinClientForm::FIELD_DOMAIN]) {
+                $postData[WeixinClientForm::FIELD_DOMAIN] = '*';
+            }
+            if (Client::IP_ALL == $postData[WeixinClientForm::FIELD_IP]) {
+                $postData[WeixinClientForm::FIELD_IP] = '*';
+            }
+            $form->setData($postData);
+        }
+
+
+        $this->addResultData('apiList', $apiList);
+        $this->addResultData('client', $client);
+        $this->addResultData('form', $form);
+        $this->addResultData('activeID', WeixinController::class);
+
+    }
+
+
+    /**
      * Add a client
      */
     public function addAction()
