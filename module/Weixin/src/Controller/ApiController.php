@@ -528,6 +528,7 @@ class ApiController extends WeixinBaseController
             //'api-ticket' => '读取微信公众号卡券票据接口',
             'js-sign' => '微信公众号 JS-SDK 使用权限签名接口',
             //'card-sign' => '微信公众号卡券签名接口',
+            'userinfo' => '读取用户信息',
             'oauth' => '网页授权接口',
         ];
     }
