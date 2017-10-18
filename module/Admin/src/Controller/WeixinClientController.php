@@ -231,7 +231,10 @@ class WeixinClientController extends AdminBaseController
         }
 
         $wxID = $client->getClientWeixin()->getWxID();
-        $host = $this->appServer()->domain();
+        $host = $this->appConfig()->get('weixin.api.domain', '');
+        if (empty($host)) {
+            $host = $this->appServer()->domain();
+        }
 
         $allowedApis = json_decode($client->getClientApi());
         $openedApis = ApiController::OpenedApi();

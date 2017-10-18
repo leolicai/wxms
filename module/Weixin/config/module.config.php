@@ -50,6 +50,9 @@ return [
     ],
 
     'weixin' => [
+        'api' => [
+            'domain' => 'http://' . $_SERVER['HTTP_HOST'],
+        ],
         'menu' => [
             'type' => [
                 'click' => '[click] 推送按钮事件',

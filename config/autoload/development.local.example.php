@@ -8,6 +8,12 @@
 
 return [
 
+    'weixin' => [
+        'api' => [
+            'domain' => '',
+        ],
+    ],
+
     'doctrine' => [
         'connection' => [
             'orm_default' => [
