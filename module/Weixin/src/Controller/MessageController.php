@@ -54,6 +54,8 @@ XML;
 
     /**
      * Received weChat platform messages
+     *
+     * URL: /weixin/message/received/key.html
      */
     public function receivedAction()
     {

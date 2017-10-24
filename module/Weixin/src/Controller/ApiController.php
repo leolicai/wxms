@@ -371,6 +371,64 @@ class ApiController extends WeixinBaseController
 
 
     /**
+     * 用户是否是已关注粉丝判定
+     *
+     * Path: /weixin/api/member/wx_id/client_id.json?openid=OPENID
+     */
+    public function memberAction()
+    {
+        $this->setResultType(self::RESPONSE_JSON);
+
+        $wx = $this->getWx();
+        if (! $wx instanceof Weixin) {
+            $this->setResultCodeMessage(-1, 'Invalid wx id');
+            return;
+        }
+
+        $client = $this->getClient();
+        if (! $client instanceof Client) {
+            $this->setResultCodeMessage(-2, 'Invalid client id');
+            return;
+        }
+
+        if (! $this->checkApi($client, 'member')) {
+            $this->setResultCodeMessage(-101, 'Api invalid.');
+            return;
+        }
+
+        if (! $this->checkDate($client)) {
+            $this->setResultCodeMessage(-401, 'Access time invalid.');
+            return;
+        }
+
+        $openid = $this->params()->fromQuery('openid', '');
+        if (empty($openid)) {
+            $this->setResultCodeMessage(-1001, 'Invalid openid.');
+            return;
+        }
+
+        try {
+            $res = $this->appWeixinService()->userinfo($wx, $openid);
+            if (isset($res['subscribe']) && 1 == $res['subscribe']) {
+                $this->addResultData('member', '1');
+                $this->addResultData('nickname', @$res['nickname']);
+                $this->addResultData('sex', @$res['sex']);
+                $this->addResultData('city', @$res['city']);
+                $this->addResultData('province', @$res['province']);
+                $this->addResultData('country', @$res['country']);
+                $this->addResultData('headimgurl', @$res['headimgurl']);
+            } else {
+                $this->addResultData('member', '0');
+            }
+        } catch (InvalidArgumentException $e) {
+            $this->setResultCodeMessage($e->getCode(), $e->getMessage());
+            return;
+        }
+
+    }
+
+
+    /**
      * 网页授权接口
      *
      * Path: /weixin/api/oauth/wx_id/client_id.html?type=base|userinfo&url=urlencode('http://www.example.com/demo.html')
@@ -529,6 +587,7 @@ class ApiController extends WeixinBaseController
             'js-sign' => '微信公众号 JS-SDK 使用权限签名接口',
             //'card-sign' => '微信公众号卡券签名接口',
             'userinfo' => '读取用户信息',
+            'member' => '用户是否已关注',
             'oauth' => '网页授权接口',
         ];
     }
