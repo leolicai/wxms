@@ -422,6 +422,9 @@ class ApiController extends WeixinBaseController
             }
         } catch (InvalidArgumentException $e) {
             $this->setResultCodeMessage($e->getCode(), $e->getMessage());
+            if (40003 == $e->getCode()) {
+                $this->addResultData('member', '0');
+            }
             return;
         }
 
