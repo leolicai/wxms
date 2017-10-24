@@ -254,7 +254,7 @@ class WeixinClientController extends AdminBaseController
                 if('js-sign' == $apiAction) {
                     $path .= "?url=urlencode('需签名的URL')";
                 }
-                if('userinfo' == $apiAction) {
+                if('userinfo' == $apiAction || 'member' == $apiAction) {
                     $path .= "?openid=OPENID";
                 }
 
