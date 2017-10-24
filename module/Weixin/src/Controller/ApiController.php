@@ -476,8 +476,14 @@ class ApiController extends WeixinBaseController
         }
 
         $url = urldecode($this->params()->fromQuery('url', ''));
+        $this->appLogger()->info('backurl:' . PHP_EOL . $url);
+
         $clientID = base64_encode($url);
+        $this->appLogger()->info('base64ed:' . PHP_EOL . $clientID);
+
         $clientID = $this->formatBase64edString($clientID, 1);
+        $this->appLogger()->info('formatted:' . PHP_EOL  . $clientID);
+
         $state = $type;
 
         $appId = $wx->getWxAppID();
@@ -498,6 +504,8 @@ class ApiController extends WeixinBaseController
         $goUrl .= '&state=' . $state;
         $goUrl .= '#wechat_redirect';
 
+        $this->appLogger()->info('goUrl:' . PHP_EOL . $clientID);
+
         $this->redirect()->toUrl($goUrl);
     }
 
@@ -507,17 +515,23 @@ class ApiController extends WeixinBaseController
      */
     public function oauthedAction()
     {
-        $wx = $this->getWx();
-        if (! $wx instanceof Weixin) {
-            $this->setResultTextData('lost wx id');
+        $client = $this->params()->fromRoute('client', '');
+        $this->appLogger()->info('transfer callback:' . PHP_EOL . $client);
+
+        $client = $this->formatBase64edString($client, 0);
+        $this->appLogger()->info('formatted callback:' . PHP_EOL . $client);
+
+        $goUrl = base64_decode($client);
+        $this->appLogger()->info('callback:' . PHP_EOL . $goUrl);
+
+        if (empty($goUrl)) {
+            $this->setResultTextData('lost client url');
             return;
         }
 
-        $client = $this->params()->fromRoute('client', '');
-        $client = $this->formatBase64edString($client, 0);
-        $goUrl = base64_decode($client);
-        if (empty($goUrl)) {
-            $this->setResultTextData('lost client url');
+        $wx = $this->getWx();
+        if (! $wx instanceof Weixin) {
+            $this->setResultTextData('lost wx id');
             return;
         }
 
