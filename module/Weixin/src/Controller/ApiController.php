@@ -96,6 +96,10 @@ class ApiController extends WeixinBaseController
 
     public function indexAction()
     {
+        $url = 'xxxx=y%3Dyyy';
+        echo urlencode($url);
+        echo '<br>';
+        echo urldecode(urlencode($url));
         $this->setResultTextData('');
     }
 
@@ -473,6 +477,7 @@ class ApiController extends WeixinBaseController
 
         $url = urldecode($this->params()->fromQuery('url', ''));
         $clientID = base64_encode($url);
+        $clientID = $this->formatBase64edString($clientID, 1);
         $state = $type;
 
         $appId = $wx->getWxAppID();
@@ -508,7 +513,9 @@ class ApiController extends WeixinBaseController
             return;
         }
 
-        $goUrl = base64_decode($this->params()->fromRoute('client', ''));
+        $client = $this->params()->fromRoute('client', '');
+        $client = $this->formatBase64edString($client, 0);
+        $goUrl = base64_decode($client);
         if (empty($goUrl)) {
             $this->setResultTextData('lost client url');
             return;
@@ -575,6 +582,21 @@ class ApiController extends WeixinBaseController
         $goUrl .= '?' . implode('&', $extra) . $goUrlFragment;
 
         $this->redirect()->toUrl($goUrl);
+    }
+
+
+    private function formatBase64edString($base64_str, $mode = 1)
+    {
+        if (1 == $mode) {
+            $base64_str = str_replace('+', '___', $base64_str);
+            $base64_str = str_replace('/', '____', $base64_str);
+            $base64_str = str_replace('=', '_____', $base64_str);
+        } else {
+            $base64_str = str_replace('___', '+', $base64_str);
+            $base64_str = str_replace('____', '/', $base64_str);
+            $base64_str = str_replace('_____', '=', $base64_str);
+        }
+        return $base64_str;
     }
 
 

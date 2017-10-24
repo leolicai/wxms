@@ -126,8 +126,8 @@ return [
                         'options' => [
                             'route' => 'index[/:action[/:key]][:suffix]',
                             'constraints' => [
-                                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
-                                'key' => '[a-zA-Z0-9_\-]+',
+                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                                'key' => '[a-zA-Z0-9_-]+',
                                 'suffix' => '(/|.html)',
                             ],
                             'defaults' => [
@@ -142,8 +142,8 @@ return [
                         'options' => [
                             'route' => 'message[/:action[/:key]][:suffix]',
                             'constraints' => [
-                                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
-                                'key' => '[a-zA-Z0-9_\-]+',
+                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                                'key' => '[a-zA-Z0-9_-]+',
                                 'suffix' => '(/|.html)',
                             ],
                             'defaults' => [
@@ -158,9 +158,9 @@ return [
                         'options' => [
                             'route' => 'api[/:action[/:wx[/:client]]][:suffix]',
                             'constraints' => [
-                                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
                                 'wx' => '[0-9]+',
-                                'client' => '[a-zA-Z0-9_\-\=]+',
+                                'client' => '[a-zA-Z0-9_-]+',
                                 'suffix' => '(/|.json|.html)',
                             ],
                             'defaults' => [
