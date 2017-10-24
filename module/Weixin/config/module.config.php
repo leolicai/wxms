@@ -160,7 +160,7 @@ return [
                             'constraints' => [
                                 'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
                                 'wx' => '[0-9]+',
-                                'client' => '[a-zA-Z0-9_-]+',
+                                'client' => '[a-zA-Z0-9_\-\+\=]+',
                                 'suffix' => '(/|.json|.html)',
                             ],
                             'defaults' => [

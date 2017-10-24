@@ -476,13 +476,7 @@ class ApiController extends WeixinBaseController
         }
 
         $url = urldecode($this->params()->fromQuery('url', ''));
-        $this->appLogger()->info('backurl:' . PHP_EOL . $url);
-
-        $clientID = base64_encode($url);
-        $this->appLogger()->info('base64ed:' . PHP_EOL . $clientID);
-
-        $clientID = $this->formatBase64edString($clientID, 1);
-        $this->appLogger()->info('formatted:' . PHP_EOL  . $clientID);
+        $clientID = str_replace('/', '_', base64_encode($url));
 
         $state = $type;
 
@@ -504,8 +498,6 @@ class ApiController extends WeixinBaseController
         $goUrl .= '&state=' . $state;
         $goUrl .= '#wechat_redirect';
 
-        $this->appLogger()->info('goUrl:' . PHP_EOL . $clientID);
-
         $this->redirect()->toUrl($goUrl);
     }
 
@@ -516,14 +508,8 @@ class ApiController extends WeixinBaseController
     public function oauthedAction()
     {
         $client = $this->params()->fromRoute('client', '');
-        $this->appLogger()->info('transfer callback:' . PHP_EOL . $client);
-
-        $client = $this->formatBase64edString($client, 0);
-        $this->appLogger()->info('formatted callback:' . PHP_EOL . $client);
-
+        $client = str_replace('_', '/', $client);
         $goUrl = base64_decode($client);
-        $this->appLogger()->info('callback:' . PHP_EOL . $goUrl);
-
         if (empty($goUrl)) {
             $this->setResultTextData('lost client url');
             return;
@@ -597,22 +583,6 @@ class ApiController extends WeixinBaseController
 
         $this->redirect()->toUrl($goUrl);
     }
-
-
-    private function formatBase64edString($base64_str, $mode = 1)
-    {
-        if (1 == $mode) {
-            $base64_str = str_replace('+', '___', $base64_str);
-            $base64_str = str_replace('/', '____', $base64_str);
-            $base64_str = str_replace('=', '_____', $base64_str);
-        } else {
-            $base64_str = str_replace('___', '+', $base64_str);
-            $base64_str = str_replace('____', '/', $base64_str);
-            $base64_str = str_replace('_____', '=', $base64_str);
-        }
-        return $base64_str;
-    }
-
 
     /**
      * @return array
