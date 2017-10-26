@@ -305,7 +305,7 @@ class Module
 
         $logger = $event->getApplication()->getServiceManager()->get("AppLogger");
         foreach($headers as $header) {
-            $logger->info(__METHOD__ . PHP_EOL . $header->toString());
+            $logger->debug(__METHOD__ . PHP_EOL . $header->toString());
         }
 
 

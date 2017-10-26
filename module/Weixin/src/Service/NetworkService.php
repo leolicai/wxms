@@ -447,7 +447,7 @@ class NetworkService
      * @return array
      * @throws RuntimeException
      */
-    private static function SendPostRequest($url, $data)
+    public static function SendPostRequest($url, $data)
     {
         $res = self::SendRequest($url, $data, 'POST');
         if('{' != substr($res, 0, 1) || '}' != substr($res, -1)) {
@@ -463,7 +463,7 @@ class NetworkService
      * @return array
      * @throws RuntimeException
      */
-    private static function SendGetRequest($url)
+    public static function SendGetRequest($url)
     {
         $res = self::SendRequest($url);
         if('{' != substr($res, 0, 1) || '}' != substr($res, -1)) {
@@ -489,10 +489,11 @@ class NetworkService
      * @param string $method
      * @param array $headers
      * @param array $cookies
+     * @param int $timeout
      * @return string
      * @throws RuntimeException
      */
-    private static function SendRequest($url, $data = null, $method = 'GET', $headers = [], $cookies = [])
+    public static function SendRequest($url, $data = null, $method = 'GET', $headers = [], $cookies = [], $timeout = 30)
     {
         $headerContentType = new ContentType();
         $headerContentType->setMediaType('GET' == strtoupper($method) ? 'text/html' : 'application/x-www-form-urlencoded');
@@ -547,7 +548,7 @@ class NetworkService
         $client->setRequest($request);
         $client->setOptions([
             'maxredirects' => 0,
-            'timeout' => 30,
+            'timeout' => $timeout,
         ]);
 
         $response = $client->send();

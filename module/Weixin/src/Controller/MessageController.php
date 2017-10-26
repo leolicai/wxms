@@ -12,6 +12,8 @@ namespace Weixin\Controller;
 
 use Weixin\Entity\Event;
 use Weixin\Entity\Weixin;
+use Weixin\Exception\RuntimeException;
+use Weixin\Service\NetworkService;
 
 class MessageController extends WeixinBaseController
 {
@@ -95,7 +97,7 @@ XML;
 
         if ('event' == $msgType) {
             $result = $this->responseEvent($wx, $data);
-            $this->appLogger()->info(__METHOD__ . PHP_EOL . $result);
+            $this->appLogger()->debug(__METHOD__ . PHP_EOL . $result);
             $this->setResultTextData($result);
             return;
         }
@@ -143,7 +145,30 @@ XML;
         if (! $event instanceof Event) {
             return '';
         }
-        return self::GenerateXml(@$data['FromUserName'], @$data['ToUserName'], $event->getEventResult());
+
+        if (Event::HANDLE_TRANSFER == $event->getEventHandle()) {
+            return $this->forwardEvent($event->getEventResult(), $this->getRequest()->getContent());
+        } else {
+            return self::GenerateXml(@$data['FromUserName'], @$data['ToUserName'], $event->getEventResult());
+        }
+    }
+
+
+    /**
+     * @param string $url
+     * @param string $event_xml
+     * @return string
+     */
+    private function forwardEvent($url, $event_xml)
+    {
+        try {
+            $res = NetworkService::SendRequest($url, $event_xml, 'POST', [], [], 3);
+        } catch (\Exception $e) {
+            $this->appLogger()->err('Forward event failure.' . PHP_EOL . $url . PHP_EOL . $event_xml);
+            $this->appLogger()->exception($e);
+            $res = '';
+        }
+        return $res;
     }
 
 

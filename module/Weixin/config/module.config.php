@@ -9,6 +9,7 @@
 
 namespace Weixin;
 
+
 use Application\Service\Factory\EntityManagerFactory;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;

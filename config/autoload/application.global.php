@@ -17,7 +17,7 @@ return [
                 'filters' => [
                     'priority' => [
                         'options' => [
-                            'priority' => 7,
+                            'priority' => 6,
                         ],
                     ],
                 ],
