@@ -14,6 +14,28 @@ return [
         ],
     ],
 
+
+    'logger' => [
+        'writers' => [
+            'default' => [
+                'filters' => [
+                    'priority' => [
+                        'options' => [
+                            'priority' => 7,
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ],
+
+
+    'session_config' => [
+        'save_handler' => 'files',
+        'save_path' => __DIR__ . '/../../data/sessions', //'/tmp',
+    ],
+
+
     'doctrine' => [
         'connection' => [
             'orm_default' => [

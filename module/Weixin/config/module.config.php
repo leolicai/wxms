@@ -52,7 +52,7 @@ return [
 
     'weixin' => [
         'api' => [
-            'domain' => 'http://' . $_SERVER['HTTP_HOST'],
+            'domain' => empty($_SERVER['HTTP_HOST']) ? '' : 'http://' . @$_SERVER['HTTP_HOST'],
         ],
         'menu' => [
             'type' => [
