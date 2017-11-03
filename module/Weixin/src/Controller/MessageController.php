@@ -102,8 +102,36 @@ XML;
             return;
         }
 
+        if ('text' == $msgType) {
+            $result = $this->responseText($wx, $data);
+            $this->appLogger()->debug(__METHOD__ . PHP_EOL . $result);
+            $this->setResultTextData($result);
+            return;
+        }
+
         $this->setResultTextData('');
         return;
+    }
+
+
+    private function responseText(Weixin $wx, $data)
+    {
+        if (empty($data['Content']) || strlen($data['Content']) > 45) {
+            return '';
+        }
+
+        $wxManager = $this->appWeixinManager();
+        $event = $wxManager->getWeixinEvent($wx, 'text', $data['Content']);
+        if (! $event instanceof Event) {
+            return '';
+        }
+
+        if (Event::HANDLE_TRANSFER == $event->getEventHandle()) {
+            return $this->forwardEvent($event->getEventResult(), $this->getRequest()->getContent());
+        } else {
+            return self::GenerateXml(@$data['FromUserName'], @$data['ToUserName'], $event->getEventResult());
+        }
+
     }
 
 
@@ -129,7 +157,7 @@ XML;
             }
         }
 
-        if ('scan' == $eventName || 'view' == $eventName) {
+        if ('scan' == $eventName || 'click' == $eventName) {
             if (!isset($data['EventKey']) || empty($data['EventKey'])) {
                 $eventKey = '';
             } else {
