@@ -51,8 +51,7 @@ $this->inlineScript()->captureEnd();
                                 data-toggle="popover"
                                 data-trigger="focus"
                                 title="回应设置"
-                                data-content="<?php echo addslashes($event->getEventResult()); ?>"
-                        ><?php echo $event->getEventHandleAsString(); ?></a>
+                                data-content='<?php echo $event->getEventResult(); ?>'><?php echo $event->getEventHandleAsString(); ?></a>
                     </td>
                     <td>
                         <ul class="nav nav-pills actions-list" role="tablist">
